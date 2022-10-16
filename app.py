@@ -1,28 +1,28 @@
 #!/usr/bin/env python3
 import os
+from pathlib import Path
+import json
 
 import aws_cdk as cdk
-
 from aws_genaric_datapipeline.aws_genaric_datapipeline_stack import AwsGenaricDatapipelineStack
-
+from templates.cds_view_template import CdsViewTemplate
 
 app = cdk.App()
-AwsGenaricDatapipelineStack(app, "AwsGenaricDatapipelineStack",
-    # If you don't specify 'env', this stack will be environment-agnostic.
-    # Account/Region-dependent features and context lookups will not work,
-    # but a single synthesized template can be deployed anywhere.
+env = cdk.Environment(region="us-east-1", account="680832645642")
+AwsGenaricDatapipelineStack(app, "AwsGenaricDatapipelineStack", env=env)
 
-    # Uncomment the next line to specialize this stack for the AWS Account
-    # and Region that are implied by the current CLI configuration.
+dir_path  = Path().absolute()
+pipeline_path = os.path.join(dir_path, "pipelines")
 
-    #env=cdk.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region=os.getenv('CDK_DEFAULT_REGION')),
+for path, subdirs, files in os.walk(pipeline_path):
+    for name in files:
+        file_path = os.path.join(path, name)
+        f = open(file_path)
+        data = json.load(f)
 
-    # Uncomment the next line if you know exactly what Account and Region you
-    # want to deploy the stack to. */
+        if data['template'] == 'cds_view':
+            stack_name = data["project"] + "-" + data["subject"] + "-" + data["config"]["job_src"]
+            CdsViewTemplate(app, stack_name, json_dict=data,  env=env)
 
-    #env=cdk.Environment(account='123456789012', region='us-east-1'),
-
-    # For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
-    )
 
 app.synth()

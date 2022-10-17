@@ -42,7 +42,7 @@ class CdsViewTemplate(Stack):
                 storage_descriptor=_glue.CfnTable.StorageDescriptorProperty(
                     columns=columns,
                     compressed=False,
-                    input_format="org.apache.hudi.hadoop.HoodieParquetInputFormat",
+                    input_format="org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
                     location="s3://" + json_dict["prepared"]["preparedBucket"] + "/" + json_dict["raw"]["rawS3Folder"] + "/",
                     output_format="org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
                     serde_info=_glue.CfnTable.SerdeInfoProperty(

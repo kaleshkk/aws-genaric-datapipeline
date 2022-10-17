@@ -13,6 +13,7 @@ from awsglue.job import Job
 from pyspark.context import SparkContext
 from pyspark.sql.functions import lit
 
+
 def main():
     """
     main functions dose start the execution
@@ -52,10 +53,12 @@ def main():
         targetDF = srcDYF.toDF().withColumn("ETL_PART_KEY", lit(todayDateTimeFormatted))
         targetDYF = srcDYF.fromDF(targetDF, glueContext, "targetDYF")
         # write data into raw layer
-        writeDataFrame(glueContext, targetDYF, rawBucket, rawS3Folder, job_src, jobName, dynamoTable, todayDateTimeFormatted)
+        writeDataFrame(glueContext, targetDYF, rawBucket, rawS3Folder, job_src, jobName, dynamoTable,
+                       todayDateTimeFormatted)
     except Exception as e:
         print("ERROR main process: {0}".format(e))
         sys.exit(1)
+
 
 def initializeGlueSpark():
     """
@@ -74,6 +77,7 @@ def initializeGlueSpark():
     except Exception as e:
         print("ERROR initializing the spark and glue variables: {0}".format(e))
         sys.exit(1)
+
 
 def calculateDates():
     """
@@ -95,6 +99,7 @@ def calculateDates():
         print("ERROR calculating Dates: {0}".format(e))
         sys.exit(1)
 
+
 def loadDataFrame(glueContext, spark, cdsView):
     """
     Read data from SAP using JDBC and return DynamicFrame
@@ -109,10 +114,10 @@ def loadDataFrame(glueContext, spark, cdsView):
         print("Reading data from source...")
 
         ## Fetch credentials from secrets manager
-        dbUsername = ''
-        dbPassword = ''
-        dbUrl = ''
-        jdbcDriverName = ''
+        dbUsername = 'admin'
+        dbPassword = 'Kalesh2!'
+        dbUrl = 'jdbc:mysql://database-1.cow053srnzcb.us-east-1.rds.amazonaws.com:3306'
+        jdbcDriverName = 'com.mysql.jdbc.Driver'
 
         srcDF = spark.read.format("jdbc") \
             .option("driver", jdbcDriverName) \
@@ -121,7 +126,7 @@ def loadDataFrame(glueContext, spark, cdsView):
             .option("password", dbPassword) \
             .option(
             "dbtable",
-            """(select * from {cdsView}) as view""".format(
+            """(select * from test.{cdsView}) as view""".format(
                 cdsView=cdsView)).load()
 
         ##Convert DataFrames to AWS Glue's DynamicFrames Object
@@ -133,7 +138,9 @@ def loadDataFrame(glueContext, spark, cdsView):
         print("ERROR while reading data from source: {0}".format(e))
         sys.exit(1)
 
-def writeDataFrame(glueContext, targetDYF, rawBucket, rawS3Folder, job_src, jobName, dynamoTable, todayDateTimeFormatted):
+
+def writeDataFrame(glueContext, targetDYF, rawBucket, rawS3Folder, job_src, jobName, dynamoTable,
+                   todayDateTimeFormatted):
     """
     Write data into Raw layer
     param glueContext: glue context
@@ -155,8 +162,9 @@ def writeDataFrame(glueContext, targetDYF, rawBucket, rawS3Folder, job_src, jobN
 
         ## write data into rwa layer in specific key by generated timestamp, in snappy compression
         glueContext.write_dynamic_frame.from_options(frame=targetDYF,
-            connection_options={'path': rawS3Location, "compression": "snappy"},
-            connection_type='s3', format='parquet')
+                                                     connection_options={'path': rawS3Location,
+                                                                         "compression": "snappy"},
+                                                     connection_type='s3', format='parquet')
 
         ## log job details into dynamodb
         insertIntoDynamoDB(todayDateTimeFormatted, rawBucket, rawS3Folder, rawEntryCount, job_src, jobName, dynamoTable)
@@ -164,6 +172,7 @@ def writeDataFrame(glueContext, targetDYF, rawBucket, rawS3Folder, job_src, jobN
     except Exception as e:
         print("ERROR while writing data into s3: {0}".format(e))
         sys.exit(1)
+
 
 def insertIntoDynamoDB(todayDateTimeFormatted, rawBucket, rawS3Folder, rawEntryCount, job_src, jobName, dynamoTable):
     """
@@ -179,17 +188,22 @@ def insertIntoDynamoDB(todayDateTimeFormatted, rawBucket, rawS3Folder, rawEntryC
 
     try:
         print("Writing log into dynamoDB...")
-        client = boto3.resource('dynamodb')
-        tbl = client.Table(dynamoTable)
-        input = {'partition_key': todayDateTimeFormatted,
-                 'State': 'RAW COMPLETED',
-                 'RawBucket': rawBucket,
-                 'RawFolder': rawS3Folder,
-                 'RawJobName': jobName,
-                 'RawEntryCount': rawEntryCount,
-                 'job_src': job_src
-                 }
-        response = tbl.put_item(Item=input)
+        client = boto3.client('dynamodb')
+        print(client)
+
+        response = client.put_item(
+            TableName='pipeline_table',
+            Item={
+                "partition_key": {"S": str(todayDateTimeFormatted)},
+                "job_src": {"S": job_src},
+                "RawBucket": {"S": rawBucket},
+                "RawEntryCount": {"S": str(rawEntryCount)},
+                "RawFolder": {"S": rawS3Folder},
+                "RawJobName": {"S": jobName},
+                "State": {"S": "RAW COMPLETED"}
+            }
+        )
+        print(response)
         print("Writing log into dynamoDB completed.")
     except Exception as e:
         print("ERROR while logging into DynamoDB: {0}".format(e))

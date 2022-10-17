@@ -46,7 +46,7 @@ class AwsGenaricDatapipelineStack(Stack):
                                number_of_workers=2,
                                worker_type="Standard",
                                default_arguments={
-                                   'job_src': 'not set',
+                                   '--job_src': 'not set',
                                    '--extra-jars':'s3://genaric-pipeline-code-resourse/jar/mysql-connector-java-8.0.30.jar'
                                }
                                )
@@ -64,7 +64,7 @@ class AwsGenaricDatapipelineStack(Stack):
                                     number_of_workers=2,
                                     worker_type="Standard",
                                     default_arguments={
-                                        'job_src': 'not set'
+                                        '--job_src': 'not set'
                                     }
                                     )
 

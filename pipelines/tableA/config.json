@@ -16,7 +16,7 @@
     },
     "data_object": {
         "name": "table_a",
-        "shema": [
+        "schema": [
             {"name":  "a", "type":  "string", "comment":  "col a"},
             {"name":  "b", "type":  "string", "comment":  "col b"},
             {"name":  "c", "type":  "string", "comment":  "col c"}

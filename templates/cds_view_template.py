@@ -25,7 +25,7 @@ class CdsViewTemplate(Stack):
         ## create table
         columns = []
 
-        for col in json_dict["data_object"]["shema"]:
+        for col in json_dict["data_object"]["schema"]:
             columns.append(_glue.CfnTable.ColumnProperty(
                         name=col["name"],
                         comment=col["comment"],

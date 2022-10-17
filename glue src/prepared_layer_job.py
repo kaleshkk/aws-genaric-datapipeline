@@ -38,10 +38,12 @@ def main():
 
         preparedBucket = job_args['prepared']['preparedBucket']
         dynamoTable = job_args['config']['dynamoTable']
+        print(dynamoTable, job_src)
 
 
         ## Read data from dynamoDB
         items = readFromDynamoDB(dynamoTable, job_src)
+        print(items)
 
         for item in items:
             ## processing raw completed items
@@ -113,10 +115,10 @@ def writeDataFrame(glueContext, preparedDYF, item, preparedBucket, jobName, dyna
 
     try:
         print("Write data into Raw layer...")
-        preparedDF = preparedDYF.toDF().repartition("cdm_sales_organization")
+        preparedDF = preparedDYF.toDF()
         preparedDYF = DynamicFrame.fromDF(preparedDF, glueContext, "preparedDYF")
         preparedEntryCount = preparedDF.count()
-        preparedS3Folder = "Incremental" + "/" + item["RawFolder"]
+        preparedS3Folder =  item["RawFolder"]
 
         print("Writing to S3 Incremental location")
         glueContext.write_dynamic_frame_from_options(
@@ -148,7 +150,7 @@ def readFromDynamoDB(dynamoTable, job_src):
         resource = boto3.resource('dynamodb')
         table = resource.Table(dynamoTable)
         scanKeyWordArgs = {
-            'FilterExpression': Key('job_src').eq(job_src) & Key('State').eq("RAW COMPLETED") & Key('RawEntryCount').gt(0),
+            'FilterExpression': Key('job_src').eq(job_src) & Key('State').eq("RAW COMPLETED"),
             'ConsistentRead': True
         }
 
@@ -183,22 +185,23 @@ def updateDynamoDB(item, preparedBucket, preparedS3Folder, preparedEntryCount, j
 
     try:
         print("Writing log into dynamoDB...")
-        client = boto3.resource('dynamodb')
-        tbl = client.Table(dynamoTable)
-        input = {
-            'partition_key': item['partition_key'],
-            'State': 'PREPARED COMPLETED',
-            'job_src': item['job_src'],
-            'RawBucket': item['RawBucket'],
-            'RawEntryCount': item['RawEntryCount'],
-            'RawFolder': item['RawFolder'],
-            'RawJobName': item['RawJobName'],
-            'PreparedBucket': preparedBucket,
-            'PreparedFolder': preparedS3Folder,
-            'PreparedJobName': jobName,
-            'PreparedEntryCount': preparedEntryCount}
-
-        response = tbl.put_item(Item=input)
+        client = boto3.client('dynamodb')
+        response = client.put_item(
+            TableName='pipeline_table',
+            Item={
+                 "partition_key": {"S": str(todayDateTimeFormatted)},
+                 "State": {"S": "RAW COMPLETED"},
+                 "job_src": {"S": job_src},
+                 "RawBucket": {"S": rawBucket},
+                 "RawEntryCount": {"S": str(rawEntryCount)},
+                 "RawFolder": {"S": rawS3Folder},
+                 "RawJobName": {"S": jobName},
+                 "PreparedBucket": {"S": preparedBucket},
+                 "PreparedFolder": {"S": preparedS3Folder},
+                 "PreparedJobName": {"S": jobName},
+                 "PreparedEntryCount": {"S": str(preparedEntryCount)}
+            }
+        )
         print("Writing log into dynamoDB completed.")
     except Exception as e:
         print("ERROR while logging into DynamoDB: {0}".format(e))

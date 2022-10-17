@@ -39,11 +39,15 @@ class AwsGenaricDatapipelineStack(Stack):
                                    python_version="3",
                                    script_location="s3://genaric-pipeline-code-resourse/source/raw_layer_job.py"
                                ),
+                               connections= {
+                                    "connections": ['my-sql'],
+                                },
                                glue_version="2.0",
                                number_of_workers=2,
                                worker_type="Standard",
                                default_arguments={
-                                   'job_src': 'not set'
+                                   'job_src': 'not set',
+                                   '--extra-jars':'s3://genaric-pipeline-code-resourse/jar/mysql-connector-java-8.0.30.jar'
                                }
                                )
 

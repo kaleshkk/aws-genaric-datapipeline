@@ -1,16 +1,11 @@
 from aws_cdk import (
-    Duration,
     Stack,
-    pipelines as _pipelines,
-    Environment as _Environment
+    pipelines as _pipelines
 )
 from constructs import Construct
-import os
 from pathlib import Path
-import json
+from application import Application
 
-from basic_infrastructure.basic_infrastructure_stack import BasicInfrastructureStack
-from templates.cds_view_template import CdsViewTemplate
 
 
 class CICDPipelineStack(Stack):
@@ -29,20 +24,5 @@ class CICDPipelineStack(Stack):
                                                                      )
                                            )
 
-        env = _Environment(region="us-east-1", account="680832645642")
-        pipeline.add_stage(BasicInfrastructureStack(self, "BasicInfrastructureStack", env=env))
-
-        dir_path = Path().absolute()
-        pipeline_path = os.path.join(dir_path, "../", "pipelines")
-
-        for path, subdirs, files in os.walk(pipeline_path):
-            for name in files:
-                file_path = os.path.join(path, name)
-                f = open(file_path)
-                data = json.load(f)
-
-                if data['template'] == 'cds_view':
-                    stack_name = data["project"] + "-" + data["subject"] + "-" + data["config"]["job_src"]
-                    CdsViewTemplate(self, stack_name, json_dict=data, env=env)
-
-
+        
+        pipeline.add_stage(Application(self, "Application"))

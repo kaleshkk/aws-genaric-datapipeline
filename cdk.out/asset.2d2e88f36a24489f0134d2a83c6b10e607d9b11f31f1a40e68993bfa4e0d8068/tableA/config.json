@@ -1,0 +1,24 @@
+{
+    "template": "cds_view",
+    "project": "test",
+    "subject": "new",
+    "config": {
+        "job_src": "tableA",
+        "dynamoTable": "pipeline_table"
+    },
+    "raw": {
+        "rawBucket": "raw-layer-test-bucket",
+        "rawS3Folder": "tableA",
+        "CDSView": "table_a"
+    },
+    "prepared": {
+        "preparedBucket": "prepared-layer-test-bucket"
+    },
+    "data_object": {
+        "meta_data": [
+            {"col":  "a", "type":  "string", "comment":  "col a"},
+            {"col":  "b", "type":  "string", "comment":  "col b"},
+            {"col":  "c", "type":  "string", "comment":  "col c"}
+        ]
+    }
+}

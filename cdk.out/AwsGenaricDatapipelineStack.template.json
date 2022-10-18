@@ -1,0 +1,442 @@
+{
+ "Resources": {
+  "pipelinetableA14B7877": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "KeySchema": [
+     {
+      "AttributeName": "partition_key",
+      "KeyType": "HASH"
+     }
+    ],
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "partition_key",
+      "AttributeType": "S"
+     }
+    ],
+    "ProvisionedThroughput": {
+     "ReadCapacityUnits": 5,
+     "WriteCapacityUnits": 5
+    },
+    "StreamSpecification": {
+     "StreamViewType": "NEW_IMAGE"
+    },
+    "TableName": "pipeline_table"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "AwsGenaricDatapipelineStack/pipeline-table/Resource"
+   }
+  },
+  "rawlayerjob": {
+   "Type": "AWS::Glue::Job",
+   "Properties": {
+    "Command": {
+     "Name": "glueetl",
+     "PythonVersion": "3",
+     "ScriptLocation": "s3://genaric-pipeline-code-resourse/source/raw_layer_job.py"
+    },
+    "Role": "AWSGlueServiceRole-ETL",
+    "Connections": {
+     "Connections": [
+      "my-sql"
+     ]
+    },
+    "DefaultArguments": {
+     "job_src": "not set",
+     "--extra-jars": "s3://genaric-pipeline-code-resourse/jar/mysql-connector-java-8.0.30.jar"
+    },
+    "GlueVersion": "2.0",
+    "Name": "raw_layer_job",
+    "NumberOfWorkers": 2,
+    "WorkerType": "Standard"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AwsGenaricDatapipelineStack/raw_layer_job"
+   }
+  },
+  "preparedlayerjob": {
+   "Type": "AWS::Glue::Job",
+   "Properties": {
+    "Command": {
+     "Name": "glueetl",
+     "PythonVersion": "3",
+     "ScriptLocation": "s3://genaric-pipeline-code-resourse/source/prepared_layer_job.py"
+    },
+    "Role": "AWSGlueServiceRole-ETL",
+    "DefaultArguments": {
+     "job_src": "not set"
+    },
+    "GlueVersion": "2.0",
+    "Name": "prepared_layer_job",
+    "NumberOfWorkers": 2,
+    "WorkerType": "Standard"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AwsGenaricDatapipelineStack/prepared_layer_job"
+   }
+  },
+  "invokepreparedServiceRoleB3FC4717": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AwsGenaricDatapipelineStack/invoke_prepared/ServiceRole/Resource"
+   }
+  },
+  "invokepreparedServiceRoleDefaultPolicy85C5D1C5": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "dynamodb:ListStreams",
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "dynamodb:DescribeStream",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "pipelinetableA14B7877",
+         "StreamArn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "invokepreparedServiceRoleDefaultPolicy85C5D1C5",
+    "Roles": [
+     {
+      "Ref": "invokepreparedServiceRoleB3FC4717"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AwsGenaricDatapipelineStack/invoke_prepared/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "invokeprepared6FD0F9B3": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-680832645642-us-east-1",
+     "S3Key": "60764b08c1d19cda3151f91bf7299b6b844cbbb4848f0ca10368e257b9bfcd58.zip"
+    },
+    "Role": {
+     "Fn::GetAtt": [
+      "invokepreparedServiceRoleB3FC4717",
+      "Arn"
+     ]
+    },
+    "Handler": "invoke_prepared.handler",
+    "Runtime": "python3.7"
+   },
+   "DependsOn": [
+    "invokepreparedServiceRoleDefaultPolicy85C5D1C5",
+    "invokepreparedServiceRoleB3FC4717"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AwsGenaricDatapipelineStack/invoke_prepared/Resource",
+    "aws:asset:path": "asset.60764b08c1d19cda3151f91bf7299b6b844cbbb4848f0ca10368e257b9bfcd58",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "invokepreparedDynamoDBEventSourceAwsGenaricDatapipelineStackpipelinetableFBA0D231B50531B9": {
+   "Type": "AWS::Lambda::EventSourceMapping",
+   "Properties": {
+    "FunctionName": {
+     "Ref": "invokeprepared6FD0F9B3"
+    },
+    "BatchSize": 1,
+    "EventSourceArn": {
+     "Fn::GetAtt": [
+      "pipelinetableA14B7877",
+      "StreamArn"
+     ]
+    },
+    "StartingPosition": "TRIM_HORIZON"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AwsGenaricDatapipelineStack/invoke_prepared/DynamoDBEventSource:AwsGenaricDatapipelineStackpipelinetableFBA0D231/Resource"
+   }
+  },
+  "soursefiledeplaymentAwsCliLayer250D86F1": {
+   "Type": "AWS::Lambda::LayerVersion",
+   "Properties": {
+    "Content": {
+     "S3Bucket": "cdk-hnb659fds-assets-680832645642-us-east-1",
+     "S3Key": "c409e6c5845f1f349df8cd84e160bf6f1c35d2b060b63e1f032f9bd39d4542cc.zip"
+    },
+    "Description": "/opt/awscli/aws"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AwsGenaricDatapipelineStack/sourse_file_deplayment/AwsCliLayer/Resource",
+    "aws:asset:path": "asset.c409e6c5845f1f349df8cd84e160bf6f1c35d2b060b63e1f032f9bd39d4542cc.zip",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Content"
+   }
+  },
+  "soursefiledeplaymentCustomResource1C65CC86": {
+   "Type": "Custom::CDKBucketDeployment",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536",
+      "Arn"
+     ]
+    },
+    "SourceBucketNames": [
+     "cdk-hnb659fds-assets-680832645642-us-east-1"
+    ],
+    "SourceObjectKeys": [
+     "b58289dad957d0c7f53ef26ed5f8d6d48e6b094614794da28a88e0113cc290a6.zip"
+    ],
+    "DestinationBucketName": "genaric-pipeline-code-resourse",
+    "DestinationBucketKeyPrefix": "pipelines/",
+    "Prune": true
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "AwsGenaricDatapipelineStack/sourse_file_deplayment/CustomResource/Default"
+   }
+  },
+  "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AwsGenaricDatapipelineStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/Resource"
+   }
+  },
+  "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:GetBucket*",
+        "s3:GetObject*",
+        "s3:List*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        "arn:aws:s3:::cdk-hnb659fds-assets-680832645642-us-east-1",
+        "arn:aws:s3:::cdk-hnb659fds-assets-680832645642-us-east-1/*"
+       ]
+      },
+      {
+       "Action": [
+        "s3:Abort*",
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:GetObject*",
+        "s3:List*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        "arn:aws:s3:::genaric-pipeline-code-resourse",
+        "arn:aws:s3:::genaric-pipeline-code-resourse/*"
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF",
+    "Roles": [
+     {
+      "Ref": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AwsGenaricDatapipelineStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-680832645642-us-east-1",
+     "S3Key": "6ddcf10002539818a9256eff3fb2b22aa09298d8f946e26ba121c175a600c44e.zip"
+    },
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265",
+      "Arn"
+     ]
+    },
+    "Handler": "index.handler",
+    "Layers": [
+     {
+      "Ref": "soursefiledeplaymentAwsCliLayer250D86F1"
+     }
+    ],
+    "Runtime": "python3.9",
+    "Timeout": 900
+   },
+   "DependsOn": [
+    "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF",
+    "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AwsGenaricDatapipelineStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/Resource",
+    "aws:asset:path": "asset.6ddcf10002539818a9256eff3fb2b22aa09298d8f946e26ba121c175a600c44e",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "soursecodedeplaymentAwsCliLayerFF3EB7A6": {
+   "Type": "AWS::Lambda::LayerVersion",
+   "Properties": {
+    "Content": {
+     "S3Bucket": "cdk-hnb659fds-assets-680832645642-us-east-1",
+     "S3Key": "c409e6c5845f1f349df8cd84e160bf6f1c35d2b060b63e1f032f9bd39d4542cc.zip"
+    },
+    "Description": "/opt/awscli/aws"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AwsGenaricDatapipelineStack/sourse_code_deplayment/AwsCliLayer/Resource",
+    "aws:asset:path": "asset.c409e6c5845f1f349df8cd84e160bf6f1c35d2b060b63e1f032f9bd39d4542cc.zip",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Content"
+   }
+  },
+  "soursecodedeplaymentCustomResourceA6A8C488": {
+   "Type": "Custom::CDKBucketDeployment",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536",
+      "Arn"
+     ]
+    },
+    "SourceBucketNames": [
+     "cdk-hnb659fds-assets-680832645642-us-east-1"
+    ],
+    "SourceObjectKeys": [
+     "ad648349536548bf22bc834329c480b0e9e5c12e074f9cdf85852a9b1d99164c.zip"
+    ],
+    "DestinationBucketName": "genaric-pipeline-code-resourse",
+    "DestinationBucketKeyPrefix": "source/",
+    "Prune": true
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "AwsGenaricDatapipelineStack/sourse_code_deplayment/CustomResource/Default"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/21Qy07EMAz8lr2nBrGAuO4WOCCQVi3iWrmpt4TmUdUJq6rqv5O0q544zXjicca+g/tHuN3hhTPZdJlWNUylR9mJKFVTM1o0roniJ9aaRH62C5lFqwNBLN9cLTSaukGYXoOVXjmb2jb+8kvWly4Mkj6w75Vt0/P/6juONHzRwMlYRlGTd9uoWSg0MBVuDbLgyWklx1SubBa8ryZkJs9wSCAa6rUbTfwPjkF25J83IXVfxSNy3KogXjKJxRoP0aZk636VTumqeBepFRwunGu1BBZ5YO/M5k3ZrnwWp9F/O3uzhyd42P2wUtkQrFeGoFjxD/TPTRmCAQAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AwsGenaricDatapipelineStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

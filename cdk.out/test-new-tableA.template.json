@@ -1,0 +1,110 @@
+{
+ "Resources": {
+  "CnfCDSviewTrigger": {
+   "Type": "AWS::Glue::Trigger",
+   "Properties": {
+    "Actions": [
+     {
+      "Arguments": {
+       "job_src": "tableA"
+      },
+      "JobName": "raw_layer_job"
+     }
+    ],
+    "Type": "ON_DEMAND",
+    "Name": "test-new-tableA-trigger"
+   },
+   "Metadata": {
+    "aws:cdk:path": "test-new-tableA/CnfCDSviewTrigger"
+   }
+  },
+  "GlueCfnTable": {
+   "Type": "AWS::Glue::Table",
+   "Properties": {
+    "CatalogId": "680832645642",
+    "DatabaseName": "pipelines_db",
+    "TableInput": {
+     "Description": "description",
+     "Name": "table_a",
+     "StorageDescriptor": {
+      "Columns": [
+       {
+        "Comment": "col a",
+        "Name": "a",
+        "Type": "string"
+       },
+       {
+        "Comment": "col b",
+        "Name": "b",
+        "Type": "string"
+       },
+       {
+        "Comment": "col c",
+        "Name": "c",
+        "Type": "string"
+       }
+      ],
+      "Compressed": false,
+      "InputFormat": "org.apache.hudi.hadoop.HoodieParquetInputFormat",
+      "Location": "s3://prepared-layer-test-bucket/tableA/",
+      "OutputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
+      "SerdeInfo": {
+       "Name": "parquet",
+       "Parameters": {
+        "serialization.format": "1"
+       },
+       "SerializationLibrary": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+      }
+     },
+     "TableType": "EXTERNAL_TABLE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "test-new-tableA/GlueCfnTable"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/yWISQ5AMBRAz2Kvn5hi7wKCvVR99alKOkRE3B2xekMCWQFxwA/LxLgyRQNcreNiDd/VS+URrmrSnSEp0YSf8kHh/VmDdvdGvFGfbt51lEIJebBYIma8drQhND8fP3Lt3mcAAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "test-new-tableA/CDKMetadata/Default"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

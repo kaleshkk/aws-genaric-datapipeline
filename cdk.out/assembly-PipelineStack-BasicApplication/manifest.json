@@ -1,0 +1,157 @@
+{
+  "version": "21.0.0",
+  "artifacts": {
+    "PipelineStackBasicApplicationBasicInfrastructureStack7FCD0C9D.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "PipelineStackBasicApplicationBasicInfrastructureStack7FCD0C9D.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "PipelineStackBasicApplicationBasicInfrastructureStack7FCD0C9D": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/unknown-region",
+      "properties": {
+        "templateFile": "PipelineStackBasicApplicationBasicInfrastructureStack7FCD0C9D.template.json",
+        "validateOnSynth": true,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/77570d403b95b8f8a0dfcbbe6ecc9dc3d4c8675933ed85e81e90e8769e6c0b2f.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "PipelineStackBasicApplicationBasicInfrastructureStack7FCD0C9D.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-lookup-role-${AWS::AccountId}-${AWS::Region}",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        },
+        "stackName": "BasicApplication-BasicInfrastructureStack"
+      },
+      "dependencies": [
+        "PipelineStackBasicApplicationBasicInfrastructureStack7FCD0C9D.assets"
+      ],
+      "metadata": {
+        "/PipelineStack/BasicApplication/BasicInfrastructureStack/pipeline-table": [
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "pipelinetableA14B7877"
+            }
+          }
+        ],
+        "/PipelineStack/BasicApplication/BasicInfrastructureStack/pipeline-table/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "pipelinetableA14B7877"
+          }
+        ],
+        "/PipelineStack/BasicApplication/BasicInfrastructureStack/raw_layer_job": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "rawlayerjob"
+          }
+        ],
+        "/PipelineStack/BasicApplication/BasicInfrastructureStack/prepared_layer_job": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "preparedlayerjob"
+          }
+        ],
+        "/PipelineStack/BasicApplication/BasicInfrastructureStack/invoke_prepared/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "invokepreparedServiceRoleB3FC4717"
+          }
+        ],
+        "/PipelineStack/BasicApplication/BasicInfrastructureStack/invoke_prepared/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "invokepreparedServiceRoleDefaultPolicy85C5D1C5"
+          }
+        ],
+        "/PipelineStack/BasicApplication/BasicInfrastructureStack/invoke_prepared/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "invokeprepared6FD0F9B3"
+          }
+        ],
+        "/PipelineStack/BasicApplication/BasicInfrastructureStack/invoke_prepared/DynamoDBEventSource:PipelineStackBasicApplicationBasicInfrastructureStackpipelinetable236571DA/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "invokepreparedDynamoDBEventSourcePipelineStackBasicApplicationBasicInfrastructureStackpipelinetable236571DA1B7B4B2A"
+          }
+        ],
+        "/PipelineStack/BasicApplication/BasicInfrastructureStack/sourse_file_deplayment/AwsCliLayer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "soursefiledeplaymentAwsCliLayer250D86F1"
+          }
+        ],
+        "/PipelineStack/BasicApplication/BasicInfrastructureStack/sourse_file_deplayment/CustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "soursefiledeplaymentCustomResource1C65CC86"
+          }
+        ],
+        "/PipelineStack/BasicApplication/BasicInfrastructureStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265"
+          }
+        ],
+        "/PipelineStack/BasicApplication/BasicInfrastructureStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF"
+          }
+        ],
+        "/PipelineStack/BasicApplication/BasicInfrastructureStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536"
+          }
+        ],
+        "/PipelineStack/BasicApplication/BasicInfrastructureStack/sourse_code_deplayment/AwsCliLayer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "soursecodedeplaymentAwsCliLayerFF3EB7A6"
+          }
+        ],
+        "/PipelineStack/BasicApplication/BasicInfrastructureStack/sourse_code_deplayment/CustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "soursecodedeplaymentCustomResourceA6A8C488"
+          }
+        ],
+        "/PipelineStack/BasicApplication/BasicInfrastructureStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/PipelineStack/BasicApplication/BasicInfrastructureStack/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable"
+          }
+        ],
+        "/PipelineStack/BasicApplication/BasicInfrastructureStack/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/PipelineStack/BasicApplication/BasicInfrastructureStack/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "PipelineStack/BasicApplication/BasicInfrastructureStack"
+    }
+  }
+}

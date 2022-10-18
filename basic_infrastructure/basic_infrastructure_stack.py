@@ -83,24 +83,24 @@ class BasicInfrastructureStack(Stack):
         ))
 
 
-        dir_path  = Path().absolute()
-        pipeline_path = _path.join(dir_path, "pipelines")
-        glue_path = _path.join(dir_path, "glue src")
-        destination_bucket = _s3.Bucket.from_bucket_arn(self, "dest_bucket", "arn:aws:s3:::genaric-pipeline-code-resourse")
+        # dir_path  = Path().absolute()
+        # pipeline_path = _path.join(dir_path, "pipelines")
+        # glue_path = _path.join(dir_path, "glue src")
+        # destination_bucket = _s3.Bucket.from_bucket_arn(self, "dest_bucket", "arn:aws:s3:::genaric-pipeline-code-resourse")
 
-        _s3_deployment.BucketDeployment(self, 
-            "sourse_file_deplayment",
-            sources=[_s3_deployment.Source.asset(pipeline_path)],
-            destination_bucket=destination_bucket,
-            destination_key_prefix='pipelines/'
-        )
+        # _s3_deployment.BucketDeployment(self, 
+        #     "sourse_file_deplayment",
+        #     sources=[_s3_deployment.Source.asset(pipeline_path)],
+        #     destination_bucket=destination_bucket,
+        #     destination_key_prefix='pipelines/'
+        # )
 
-        _s3_deployment.BucketDeployment(self, 
-            "sourse_code_deplayment",
-            sources=[_s3_deployment.Source.asset(glue_path)],
-            destination_bucket=destination_bucket,
-            destination_key_prefix='source/'
-        )
+        # _s3_deployment.BucketDeployment(self, 
+        #     "sourse_code_deplayment",
+        #     sources=[_s3_deployment.Source.asset(glue_path)],
+        #     destination_bucket=destination_bucket,
+        #     destination_key_prefix='source/'
+        # )
         
 
             

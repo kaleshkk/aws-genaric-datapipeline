@@ -14,15 +14,12 @@ from templates.cds_view_template import CdsViewTemplate
 
 
 class CICDPipelineStack(Stack):
-    def __init__(self, scope, id, *, description=None, env=None, stackName=None, tags=None, synthesizer=None,
-                 terminationProtection=None, analyticsReporting=None):
-        super().__init__(scope, id, description=description, env=env, stackName=stackName, tags=tags,
-                         synthesizer=synthesizer, terminationProtection=terminationProtection,
-                         analyticsReporting=analyticsReporting)
+    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+        super().__init__(scope, construct_id, **kwargs)
 
         pipeline = _pipelines.CodePipeline(self, "Pipeline",
-                                           synth=pipelines.ShellStep("Synth",
-                                                                     input=pipelines.CodePipelineSource.connection(
+                                           synth=_pipelines.ShellStep("Synth",
+                                                                     input=_pipelines.CodePipelineSource.connection(
                                                                          "my-org/my-app", "main",
                                                                          connection_arn="arn:aws:codestar-connections:us-east-1:222222222222:connection/7d2469ff-514a-4e4f-9003-5ca4a43cdc41"
                                                                          ),
@@ -46,6 +43,6 @@ class CICDPipelineStack(Stack):
 
                 if data['template'] == 'cds_view':
                     stack_name = data["project"] + "-" + data["subject"] + "-" + data["config"]["job_src"]
-                    CdsViewTemplate(app, stack_name, json_dict=data, env=env)
+                    CdsViewTemplate(self, stack_name, json_dict=data, env=env)
 
 

@@ -1,10 +1,10 @@
 import aws_cdk as core
 import aws_cdk.assertions as assertions
 
-from aws_genaric_datapipeline.aws_genaric_datapipeline_stack import AwsGenaricDatapipelineStack
+from basic_infrastructure.basic_infrastructure_stack import AwsGenaricDatapipelineStack
 
 # example tests. To run these tests, uncomment this file along with the example
-# resource in aws_genaric_datapipeline/aws_genaric_datapipeline_stack.py
+# resource in basic_infrastructure/basic_infrastructure.py
 def test_sqs_queue_created():
     app = core.App()
     stack = AwsGenaricDatapipelineStack(app, "aws-genaric-datapipeline")

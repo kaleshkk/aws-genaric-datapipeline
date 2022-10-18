@@ -14,7 +14,7 @@ from pathlib import Path
 from os import path as _path
 
 
-class AwsGenaricDatapipelineStack(Stack):
+class BasicInfrastructureStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)

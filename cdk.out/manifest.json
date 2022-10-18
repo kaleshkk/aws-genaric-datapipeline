@@ -8,13 +8,6 @@
         "displayName": "PipelineStack/BasicApplication"
       }
     },
-    "assembly-PipelineStack-test-new-tableA": {
-      "type": "cdk:cloud-assembly",
-      "properties": {
-        "directoryName": "assembly-PipelineStack-test-new-tableA",
-        "displayName": "PipelineStack/test-new-tableA"
-      }
-    },
     "Tree": {
       "type": "cdk:tree",
       "properties": {
@@ -37,7 +30,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::680832645642:role/cdk-hnb659fds-deploy-role-680832645642-us-east-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::680832645642:role/cdk-hnb659fds-cfn-exec-role-680832645642-us-east-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-680832645642-us-east-1/6a8a9aa6d409204a49171c58c6058a6b0e20ad76d191676f357ff3f9811af35b.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-680832645642-us-east-1/521b355a896ffa8c6b7d6d4a8e0934aab48ff22747f78e9c1f460e7c9c76428b.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [

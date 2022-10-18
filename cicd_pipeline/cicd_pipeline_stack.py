@@ -33,16 +33,16 @@ class CICDPipelineStack(Stack):
 
         pipeline.add_stage(BasicApplication(self, "BasicApplication"))
 
-        dir_path = Path().absolute()
-        pipeline_path = os.path.join(dir_path, "pipelines")
-        print(pipeline_path)
-        for path, subdirs, files in os.walk(pipeline_path):
-            for name in files:
-                file_path = os.path.join(path, name)
-                f = open(file_path)
-                data = json.load(f)
+        # dir_path = Path().absolute()
+        # pipeline_path = os.path.join(dir_path, "pipelines")
+        # print(pipeline_path)
+        # for path, subdirs, files in os.walk(pipeline_path):
+        #     for name in files:
+        #         file_path = os.path.join(path, name)
+        #         f = open(file_path)
+        #         data = json.load(f)
 
-                if data['template'] == 'cds_view':
-                    stack_name = data["project"] + "-" + data["subject"] + "-" + data["config"]["job_src"]
-                    pipeline.add_stage(TemplateStack(self, stack_name, json_dict=data))
+        #         if data['template'] == 'cds_view':
+        #             stack_name = data["project"] + "-" + data["subject"] + "-" + data["config"]["job_src"]
+        #             pipeline.add_stage(TemplateStack(self, stack_name, json_dict=data))
                     

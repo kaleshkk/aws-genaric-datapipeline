@@ -269,7 +269,7 @@
         "Configuration": {
          "ConnectionArn": "arn:aws:codestar-connections:us-east-1:680832645642:connection/0824f3ec-e9ed-416b-8560-86ab187deb2a",
          "FullRepositoryId": "kaleshkk/aws-genaric-datapipeline",
-         "BranchName": "main"
+         "BranchName": "pipeline"
         },
         "Name": "kaleshkk_aws-genaric-datapipeline",
         "OutputArtifacts": [
@@ -377,110 +377,6 @@
          }
         ],
         "Name": "FileAsset1",
-        "RoleArn": {
-         "Fn::GetAtt": [
-          "PipelineCodeBuildActionRole226DB0CB",
-          "Arn"
-         ]
-        },
-        "RunOrder": 1
-       },
-       {
-        "ActionTypeId": {
-         "Category": "Build",
-         "Owner": "AWS",
-         "Provider": "CodeBuild",
-         "Version": "1"
-        },
-        "Configuration": {
-         "ProjectName": {
-          "Ref": "PipelineAssetsFileAsset24D2D639B"
-         }
-        },
-        "InputArtifacts": [
-         {
-          "Name": "Synth_Output"
-         }
-        ],
-        "Name": "FileAsset2",
-        "RoleArn": {
-         "Fn::GetAtt": [
-          "PipelineCodeBuildActionRole226DB0CB",
-          "Arn"
-         ]
-        },
-        "RunOrder": 1
-       },
-       {
-        "ActionTypeId": {
-         "Category": "Build",
-         "Owner": "AWS",
-         "Provider": "CodeBuild",
-         "Version": "1"
-        },
-        "Configuration": {
-         "ProjectName": {
-          "Ref": "PipelineAssetsFileAsset3FE71B523"
-         }
-        },
-        "InputArtifacts": [
-         {
-          "Name": "Synth_Output"
-         }
-        ],
-        "Name": "FileAsset3",
-        "RoleArn": {
-         "Fn::GetAtt": [
-          "PipelineCodeBuildActionRole226DB0CB",
-          "Arn"
-         ]
-        },
-        "RunOrder": 1
-       },
-       {
-        "ActionTypeId": {
-         "Category": "Build",
-         "Owner": "AWS",
-         "Provider": "CodeBuild",
-         "Version": "1"
-        },
-        "Configuration": {
-         "ProjectName": {
-          "Ref": "PipelineAssetsFileAsset474303B7D"
-         }
-        },
-        "InputArtifacts": [
-         {
-          "Name": "Synth_Output"
-         }
-        ],
-        "Name": "FileAsset4",
-        "RoleArn": {
-         "Fn::GetAtt": [
-          "PipelineCodeBuildActionRole226DB0CB",
-          "Arn"
-         ]
-        },
-        "RunOrder": 1
-       },
-       {
-        "ActionTypeId": {
-         "Category": "Build",
-         "Owner": "AWS",
-         "Provider": "CodeBuild",
-         "Version": "1"
-        },
-        "Configuration": {
-         "ProjectName": {
-          "Ref": "PipelineAssetsFileAsset5184A5C2F"
-         }
-        },
-        "InputArtifacts": [
-         {
-          "Name": "Synth_Output"
-         }
-        ],
-        "Name": "FileAsset5",
         "RoleArn": {
          "Fn::GetAtt": [
           "PipelineCodeBuildActionRole226DB0CB",
@@ -932,30 +828,6 @@
         },
         {
          "Fn::GetAtt": [
-          "PipelineAssetsFileAsset24D2D639B",
-          "Arn"
-         ]
-        },
-        {
-         "Fn::GetAtt": [
-          "PipelineAssetsFileAsset3FE71B523",
-          "Arn"
-         ]
-        },
-        {
-         "Fn::GetAtt": [
-          "PipelineAssetsFileAsset474303B7D",
-          "Arn"
-         ]
-        },
-        {
-         "Fn::GetAtt": [
-          "PipelineAssetsFileAsset5184A5C2F",
-          "Arn"
-         ]
-        },
-        {
-         "Fn::GetAtt": [
           "PipelineBuildSynthCdkBuildProject6BEFA8E6",
           "Arn"
          ]
@@ -1298,138 +1170,6 @@
    },
    "Metadata": {
     "aws:cdk:path": "PipelineStack/Pipeline/Assets/FileAsset1/Resource"
-   }
-  },
-  "PipelineAssetsFileAsset24D2D639B": {
-   "Type": "AWS::CodeBuild::Project",
-   "Properties": {
-    "Artifacts": {
-     "Type": "CODEPIPELINE"
-    },
-    "Environment": {
-     "ComputeType": "BUILD_GENERAL1_SMALL",
-     "Image": "aws/codebuild/standard:5.0",
-     "ImagePullCredentialsType": "CODEBUILD",
-     "PrivilegedMode": false,
-     "Type": "LINUX_CONTAINER"
-    },
-    "ServiceRole": {
-     "Fn::GetAtt": [
-      "PipelineAssetsFileRole59943A77",
-      "Arn"
-     ]
-    },
-    "Source": {
-     "BuildSpec": "{\n  \"version\": \"0.2\",\n  \"phases\": {\n    \"install\": {\n      \"commands\": [\n        \"npm install -g cdk-assets@2\"\n      ]\n    },\n    \"build\": {\n      \"commands\": [\n        \"cdk-assets --path \\\"assembly-PipelineStack-BasicApplication/PipelineStackBasicApplicationBasicInfrastructureStack7FCD0C9D.assets.json\\\" --verbose publish \\\"c409e6c5845f1f349df8cd84e160bf6f1c35d2b060b63e1f032f9bd39d4542cc:current_account-current_region\\\"\"\n      ]\n    }\n  }\n}",
-     "Type": "CODEPIPELINE"
-    },
-    "Cache": {
-     "Type": "NO_CACHE"
-    },
-    "Description": "Pipeline step PipelineStack/Pipeline/Assets/FileAsset2",
-    "EncryptionKey": "alias/aws/s3"
-   },
-   "Metadata": {
-    "aws:cdk:path": "PipelineStack/Pipeline/Assets/FileAsset2/Resource"
-   }
-  },
-  "PipelineAssetsFileAsset3FE71B523": {
-   "Type": "AWS::CodeBuild::Project",
-   "Properties": {
-    "Artifacts": {
-     "Type": "CODEPIPELINE"
-    },
-    "Environment": {
-     "ComputeType": "BUILD_GENERAL1_SMALL",
-     "Image": "aws/codebuild/standard:5.0",
-     "ImagePullCredentialsType": "CODEBUILD",
-     "PrivilegedMode": false,
-     "Type": "LINUX_CONTAINER"
-    },
-    "ServiceRole": {
-     "Fn::GetAtt": [
-      "PipelineAssetsFileRole59943A77",
-      "Arn"
-     ]
-    },
-    "Source": {
-     "BuildSpec": "{\n  \"version\": \"0.2\",\n  \"phases\": {\n    \"install\": {\n      \"commands\": [\n        \"npm install -g cdk-assets@2\"\n      ]\n    },\n    \"build\": {\n      \"commands\": [\n        \"cdk-assets --path \\\"assembly-PipelineStack-BasicApplication/PipelineStackBasicApplicationBasicInfrastructureStack7FCD0C9D.assets.json\\\" --verbose publish \\\"6ddcf10002539818a9256eff3fb2b22aa09298d8f946e26ba121c175a600c44e:current_account-current_region\\\"\"\n      ]\n    }\n  }\n}",
-     "Type": "CODEPIPELINE"
-    },
-    "Cache": {
-     "Type": "NO_CACHE"
-    },
-    "Description": "Pipeline step PipelineStack/Pipeline/Assets/FileAsset3",
-    "EncryptionKey": "alias/aws/s3"
-   },
-   "Metadata": {
-    "aws:cdk:path": "PipelineStack/Pipeline/Assets/FileAsset3/Resource"
-   }
-  },
-  "PipelineAssetsFileAsset474303B7D": {
-   "Type": "AWS::CodeBuild::Project",
-   "Properties": {
-    "Artifacts": {
-     "Type": "CODEPIPELINE"
-    },
-    "Environment": {
-     "ComputeType": "BUILD_GENERAL1_SMALL",
-     "Image": "aws/codebuild/standard:5.0",
-     "ImagePullCredentialsType": "CODEBUILD",
-     "PrivilegedMode": false,
-     "Type": "LINUX_CONTAINER"
-    },
-    "ServiceRole": {
-     "Fn::GetAtt": [
-      "PipelineAssetsFileRole59943A77",
-      "Arn"
-     ]
-    },
-    "Source": {
-     "BuildSpec": "{\n  \"version\": \"0.2\",\n  \"phases\": {\n    \"install\": {\n      \"commands\": [\n        \"npm install -g cdk-assets@2\"\n      ]\n    },\n    \"build\": {\n      \"commands\": [\n        \"cdk-assets --path \\\"assembly-PipelineStack-BasicApplication/PipelineStackBasicApplicationBasicInfrastructureStack7FCD0C9D.assets.json\\\" --verbose publish \\\"74a9424582c5296c1b4b27a25a7e0b315179d5bdd430877e7c8ef9a78c67d101:current_account-current_region\\\"\"\n      ]\n    }\n  }\n}",
-     "Type": "CODEPIPELINE"
-    },
-    "Cache": {
-     "Type": "NO_CACHE"
-    },
-    "Description": "Pipeline step PipelineStack/Pipeline/Assets/FileAsset4",
-    "EncryptionKey": "alias/aws/s3"
-   },
-   "Metadata": {
-    "aws:cdk:path": "PipelineStack/Pipeline/Assets/FileAsset4/Resource"
-   }
-  },
-  "PipelineAssetsFileAsset5184A5C2F": {
-   "Type": "AWS::CodeBuild::Project",
-   "Properties": {
-    "Artifacts": {
-     "Type": "CODEPIPELINE"
-    },
-    "Environment": {
-     "ComputeType": "BUILD_GENERAL1_SMALL",
-     "Image": "aws/codebuild/standard:5.0",
-     "ImagePullCredentialsType": "CODEBUILD",
-     "PrivilegedMode": false,
-     "Type": "LINUX_CONTAINER"
-    },
-    "ServiceRole": {
-     "Fn::GetAtt": [
-      "PipelineAssetsFileRole59943A77",
-      "Arn"
-     ]
-    },
-    "Source": {
-     "BuildSpec": "{\n  \"version\": \"0.2\",\n  \"phases\": {\n    \"install\": {\n      \"commands\": [\n        \"npm install -g cdk-assets@2\"\n      ]\n    },\n    \"build\": {\n      \"commands\": [\n        \"cdk-assets --path \\\"assembly-PipelineStack-BasicApplication/PipelineStackBasicApplicationBasicInfrastructureStack7FCD0C9D.assets.json\\\" --verbose publish \\\"8188758892683e56f5625fd7e3a4c8c6f6e8023781b1d0d8aa9187a5cf58b7df:current_account-current_region\\\"\"\n      ]\n    }\n  }\n}",
-     "Type": "CODEPIPELINE"
-    },
-    "Cache": {
-     "Type": "NO_CACHE"
-    },
-    "Description": "Pipeline step PipelineStack/Pipeline/Assets/FileAsset5",
-    "EncryptionKey": "alias/aws/s3"
-   },
-   "Metadata": {
-    "aws:cdk:path": "PipelineStack/Pipeline/Assets/FileAsset5/Resource"
    }
   },
   "CDKMetadata": {

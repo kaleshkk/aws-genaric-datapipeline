@@ -22,7 +22,7 @@ class CICDPipelineStack(Stack):
                 input=_pipelines.CodePipelineSource.connection("kaleshkk/aws-genaric-datapipeline", "pipeline",
                     connection_arn="arn:aws:codestar-connections:us-east-1:680832645642:connection/0824f3ec-e9ed-416b-8560-86ab187deb2a"
                 ),
-                commands=["npm ci", "npm run build", "npx cdk synth"
+                commands=["npm install -g aws-cdk", "pip install -r requirements.txt", "cdk synth"
                 ]
             )
         )

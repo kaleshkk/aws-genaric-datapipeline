@@ -30,7 +30,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::680832645642:role/cdk-hnb659fds-deploy-role-680832645642-us-east-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::680832645642:role/cdk-hnb659fds-cfn-exec-role-680832645642-us-east-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-680832645642-us-east-1/521b355a896ffa8c6b7d6d4a8e0934aab48ff22747f78e9c1f460e7c9c76428b.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-680832645642-us-east-1/659a7d4f9063e7ce5e905409a2a7b79170754a176932ab6e9595460f6336510b.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -152,30 +152,6 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "PipelineAssetsFileAsset185A67CB4"
-          }
-        ],
-        "/PipelineStack/Pipeline/Assets/FileAsset2/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "PipelineAssetsFileAsset24D2D639B"
-          }
-        ],
-        "/PipelineStack/Pipeline/Assets/FileAsset3/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "PipelineAssetsFileAsset3FE71B523"
-          }
-        ],
-        "/PipelineStack/Pipeline/Assets/FileAsset4/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "PipelineAssetsFileAsset474303B7D"
-          }
-        ],
-        "/PipelineStack/Pipeline/Assets/FileAsset5/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "PipelineAssetsFileAsset5184A5C2F"
           }
         ],
         "/PipelineStack/CDKMetadata/Default": [

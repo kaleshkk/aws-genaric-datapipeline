@@ -17,7 +17,7 @@
         "validateOnSynth": true,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/77570d403b95b8f8a0dfcbbe6ecc9dc3d4c8675933ed85e81e90e8769e6c0b2f.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/a729c24f9d38c53917e7dd978c9a2d1adc2e920a14dc20d9986e734a31b3eda9.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -82,48 +82,6 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "invokepreparedDynamoDBEventSourcePipelineStackBasicApplicationBasicInfrastructureStackpipelinetable236571DA1B7B4B2A"
-          }
-        ],
-        "/PipelineStack/BasicApplication/BasicInfrastructureStack/sourse_file_deplayment/AwsCliLayer/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "soursefiledeplaymentAwsCliLayer250D86F1"
-          }
-        ],
-        "/PipelineStack/BasicApplication/BasicInfrastructureStack/sourse_file_deplayment/CustomResource/Default": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "soursefiledeplaymentCustomResource1C65CC86"
-          }
-        ],
-        "/PipelineStack/BasicApplication/BasicInfrastructureStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265"
-          }
-        ],
-        "/PipelineStack/BasicApplication/BasicInfrastructureStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/DefaultPolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF"
-          }
-        ],
-        "/PipelineStack/BasicApplication/BasicInfrastructureStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536"
-          }
-        ],
-        "/PipelineStack/BasicApplication/BasicInfrastructureStack/sourse_code_deplayment/AwsCliLayer/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "soursecodedeplaymentAwsCliLayerFF3EB7A6"
-          }
-        ],
-        "/PipelineStack/BasicApplication/BasicInfrastructureStack/sourse_code_deplayment/CustomResource/Default": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "soursecodedeplaymentCustomResourceA6A8C488"
           }
         ],
         "/PipelineStack/BasicApplication/BasicInfrastructureStack/CDKMetadata/Default": [

@@ -60,4 +60,4 @@ class CdsViewTemplate(Stack):
                                        table_type="EXTERNAL_TABLE"
                                    ))
 
-        cdk.applyRemovalPolicy(cfn_table, cdk.applyRemovalPolicy.DESTROY)
+        cdk.Fn.applyRemovalPolicy(cfn_table, cdk.applyRemovalPolicy.DESTROY)

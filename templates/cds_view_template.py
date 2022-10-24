@@ -1,8 +1,7 @@
 from aws_cdk import (
     Duration,
     Stack,
-    aws_glue as _glue,
-    applyRemovalPolicy as _applyRemovalPolicy
+    aws_glue as _glue
 )
 
 import aws_cdk as cdk

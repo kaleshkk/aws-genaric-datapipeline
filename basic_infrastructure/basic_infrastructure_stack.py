@@ -85,7 +85,7 @@ class BasicInfrastructureStack(Stack):
 
         # dir_path  = Path().absolute()
         # pipeline_path = _path.join(dir_path, "pipelines")
-        # glue_path = _path.join(dir_path, "glue src")
+        # glue_path = _path.join(dir_path, "glue_src")
         # destination_bucket = _s3.Bucket.from_bucket_arn(self, "dest_bucket", "arn:aws:s3:::genaric-pipeline-code-resourse")
         #
         # _s3_deployment.BucketDeployment(self,

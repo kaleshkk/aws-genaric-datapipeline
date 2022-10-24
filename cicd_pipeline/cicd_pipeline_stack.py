@@ -25,8 +25,8 @@ class CICDPipelineStack(Stack):
                 commands=[
                     "npm install -g aws-cdk", "pip install -r requirements.txt", "cdk synth",
                     "pwd",
-                    "aws s3 cp pipelines/ s3://genaric-pipeline-code-resourse/pipelines/",
-                    "aws s3 cp glue src/ s3://genaric-pipeline-code-resourse/source/",
+                    "aws s3 cp ./pipelines/ s3://genaric-pipeline-code-resourse/pipelines/",
+                    "aws s3 cp ./glue src/ s3://genaric-pipeline-code-resourse/source/",
                 ]
             )
         )

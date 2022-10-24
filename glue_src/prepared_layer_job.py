@@ -189,12 +189,12 @@ def updateDynamoDB(item, preparedBucket, preparedS3Folder, preparedEntryCount, j
         response = client.put_item(
             TableName='pipeline_table',
             Item={
-                 "partition_key": {"S": str(todayDateTimeFormatted)},
+                 "partition_key": {"S": str(item['partition_key'])},
                  "State": {"S": "RAW COMPLETED"},
-                 "job_src": {"S": job_src},
-                 "RawBucket": {"S": rawBucket},
-                 "RawEntryCount": {"S": str(rawEntryCount)},
-                 "RawFolder": {"S": rawS3Folder},
+                 "job_src": {"S": item['job_src']},
+                 "RawBucket": {"S": item['rawBucket']},
+                 "RawEntryCount": {"S": str(item['rawEntryCount'])},
+                 "RawFolder": {"S": item['rawS3Folder']},
                  "RawJobName": {"S": jobName},
                  "PreparedBucket": {"S": preparedBucket},
                  "PreparedFolder": {"S": preparedS3Folder},

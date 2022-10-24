@@ -23,7 +23,7 @@ class CdsViewTemplate(Stack):
                                    name=json_dict["project"] + "-" + json_dict["subject"] + "-" + json_dict["config"][
                                        "job_src"] + "-trigger",
                                    actions=[_glue.CfnTrigger.ActionProperty(job_name="raw_layer_job", arguments={
-                                       "job_src": json_dict["config"]["job_src"]})]
+                                       "--job_src": json_dict["config"]["job_src"]})]
                                    )
 
         ## create table

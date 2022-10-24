@@ -36,7 +36,6 @@ class CdsViewTemplate(Stack):
             "GlueCfnTable", 
             catalog_id="680832645642",
             database_name="pipelines_db",
-            removal_policy=rp.DESTROY,
             table_input=_glue.CfnTable.TableInputProperty(
                 description="description",
                 name=json_dict["data_object"]["name"],

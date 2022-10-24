@@ -2,6 +2,7 @@ from aws_cdk import (
     Duration,
     Stack,
     aws_glue as _glue,
+    applyRemovalPolicy as _applyRemovalPolicy,
     RemovalPolicy as rp
 )
 from constructs import Construct
@@ -57,4 +58,4 @@ class CdsViewTemplate(Stack):
                                        table_type="EXTERNAL_TABLE"
                                    ))
 
-        cfn_table.applyRemovalPolicy("DESTROY")
+        _applyRemovalPolicy(cfn_table, rp.Destroy)

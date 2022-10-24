@@ -23,7 +23,10 @@ class CICDPipelineStack(Stack):
                     connection_arn="arn:aws:codestar-connections:us-east-1:680832645642:connection/0824f3ec-e9ed-416b-8560-86ab187deb2a"
                 ),
                 commands=[
-                    "npm install -g aws-cdk", "pip install -r requirements.txt", "cdk synth"
+                    "npm install -g aws-cdk", "pip install -r requirements.txt", "cdk synth",
+                    "ls",
+                    "aws s3 cp ./pipelines/ s3://genaric-pipeline-code-resourse/pipelines/",
+                    "aws s3 cp ./glue src/ s3://genaric-pipeline-code-resourse/source/",
                 ]
             )
         )

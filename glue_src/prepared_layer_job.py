@@ -190,7 +190,7 @@ def updateDynamoDB(item, preparedBucket, preparedS3Folder, preparedEntryCount, j
             TableName='pipeline_table',
             Item={
                  "partition_key": {"S": str(item['partition_key'])},
-                 "State": {"S": "RAW COMPLETED"},
+                 "State": {"S": "PREPARED COMPLETED"},
                  "job_src": {"S": item['job_src']},
                  "RawBucket": {"S": item['RawBucket']},
                  "RawEntryCount": {"S": str(item['RawEntryCount'])},

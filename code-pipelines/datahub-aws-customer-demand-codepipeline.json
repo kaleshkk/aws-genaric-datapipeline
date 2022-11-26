@@ -189,32 +189,6 @@
                                     }
                                 ],
                                 "Region": "us-east-1"
-                            },
-                            {
-                                "Name": "DLake-Customer-Demand-SamplePipeline-Pipeline2",
-                                "ActionTypeId": {
-                                    "Category": "Deploy",
-                                    "Owner": "AWS",
-                                    "Provider": "CloudFormation",
-                                    "Version": "1"
-                                },
-                                "RunOrder": 3,
-                                "Configuration": {
-                                    "ActionMode": "CREATE_UPDATE",
-                                    "RoleArn": {
-                                        "Ref": "CloudformationRole"
-                                    },
-                                    "StackName": "DLake-Customer-Demand-SamplePipeline-Pipeline2",
-                                    "TemplateConfiguration": "SourceArtifact::pipelines/SamplePipeline/CloudFormation/Config/params.dev.json",
-                                    "TemplatePath": "SourceArtifact::pipelines/SamplePipeline/CloudFormation/cloudformation.json"
-                                },
-                                "OutputArtifacts": [],
-                                "InputArtifacts": [
-                                    {
-                                        "Name": "SourceArtifact"
-                                    }
-                                ],
-                                "Region": "us-east-1"
                             }
                         ]
                     }

@@ -191,7 +191,7 @@
                                 "Region": "us-east-1"
                             },
                             {
-                                "Name": "DLake-Customer-Demand-SamplePipeline-Pipeline",
+                                "Name": "DLake-Customer-Demand-SamplePipeline-Pipeline2",
                                 "ActionTypeId": {
                                     "Category": "Deploy",
                                     "Owner": "AWS",
@@ -204,7 +204,7 @@
                                     "RoleArn": {
                                         "Ref": "CloudformationRole"
                                     },
-                                    "StackName": "DLake-Customer-Demand-SamplePipeline-Pipeline",
+                                    "StackName": "DLake-Customer-Demand-SamplePipeline-Pipeline2",
                                     "TemplateConfiguration": "SourceArtifact::pipelines/SamplePipeline/CloudFormation/Config/params.dev.json",
                                     "TemplatePath": "SourceArtifact::pipelines/SamplePipeline/CloudFormation/cloudformation.json"
                                 },

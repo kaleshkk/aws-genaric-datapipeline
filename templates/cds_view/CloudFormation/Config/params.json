@@ -1,0 +1,8 @@
+{
+    "Parameters" : {
+        "athenaDB": "",
+        "AthenaTableLocation": "",
+        "athenaCompactedDB": "",
+        "AthenaTableCompactedLocation": ""
+    }
+}

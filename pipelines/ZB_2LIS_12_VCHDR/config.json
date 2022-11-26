@@ -1,0 +1,435 @@
+{
+	"pipeline": "ZB_2LIS_12_VCHDR",
+	"projectConfig": {
+		"template": "cds_view",
+		"frequency": "",
+		"dynamoTable": "metadata_raw_prepared_pipeline"
+	},
+	"rawLayer": {
+		"dev": {
+			"rawBucket": "ald-dl-data-raw-ue1-dev"
+		},
+		"test": {
+			"rawBucket": "ald-dl-data-raw-ue1-test"
+		},
+		"prod": {
+			"rawBucket": "ald-dl-data-raw-ue1-prod"
+		}
+	},
+	"preparedLayer": {
+		"transformations": {
+			"addColumns": [{
+					"columnName": "meta_origin",
+					"value": "SAP-ECC",
+					"supportFunction": "lit"
+				},
+				{
+					"columnName": "meta_originvers",
+					"value": "''",
+					"supportFunction": "lit"
+				}
+			],
+			"castColumns": [
+				{
+					"column": "VBELN",
+					"castInto": "VARCHAR(10)"
+				},
+				{
+					"column": "ABLAD",
+					"castInto": "VARCHAR(25)"
+				},
+				{
+					"column": "BLDAT",
+					"castInto": "DATE"
+				},
+				{
+					"column": "BTGEW",
+					"castInto": "DEC(15,0)"
+				},
+				{
+					"column": "BZIRK",
+					"castInto": "VARCHAR(6)"
+				},
+				{
+					"column": "ERDAT",
+					"castInto": "DATE"
+				},
+				{
+					"column": "FAKSK",
+					"castInto": "VARCHAR(2)"
+				},
+				{
+					"column": "GEWEI",
+					"castInto": "VARCHAR(3)"
+				}, {
+					"column": "INCO1",
+					"castInto": "VARCHAR(3)"
+				},
+				{
+					"column": "INCO2",
+					"castInto": "VARCHAR(28)"
+				},
+				{
+					"column": "KDGRP",
+					"castInto": "VARCHAR(2)"
+				},
+				{
+					"column": "KODAT",
+					"castInto": "DATE"
+				},
+				{
+					"column": "KUNAG",
+					"castInto": "VARCHAR(10)"
+				},
+				{
+					"column": "KUNNR",
+					"castInto": "VARCHAR(10)"
+				},
+				{
+					"column": "LFART",
+					"castInto": "VARCHAR(4)"
+				},
+				{
+					"column": "LFDAT",
+					"castInto": "DATE"
+				},
+				{
+					"column": "LIFEX",
+					"castInto": "VARCHAR(35)"
+				},
+				{
+					"column": "LIFNR",
+					"castInto": "VARCHAR(10)"
+				},
+				{
+					"column": "LIFSK",
+					"castInto": "VARCHAR(2)"
+				},
+				{
+					"column": "LPRIO",
+					"castInto": "DEC(2,0)"
+				},
+				{
+					"column": "LSTEL",
+					"castInto": "VARCHAR(2)"
+				},
+				{
+					"column": "MCBW_ANZPK",
+					"castInto": "DEC(5,0)"
+				},
+				{
+					"column": "NTGEW",
+					"castInto": "DEC(15,0)"
+				},
+				{
+					"column": "ROUTE",
+					"castInto": "VARCHAR(6)"
+				},
+				{
+					"column": "VBTYP",
+					"castInto": "VARCHAR(1)"
+				},
+				{
+					"column": "VERUR",
+					"castInto": "VARCHAR(35)"
+				},
+				{
+					"column": "VKORG",
+					"castInto": "VARCHAR(4)"
+				},
+				{
+					"column": "VLSTK",
+					"castInto": "VARCHAR(1)"
+				},
+				{
+					"column": "VOLEH",
+					"castInto": "VARCHAR(3)"
+				},
+				{
+					"column": "VOLUM",
+					"castInto": "DEC(15,0)"
+				},
+				{
+					"column": "VSTEL",
+					"castInto": "VARCHAR(4)"
+				},
+				{
+					"column": "WADAT",
+					"castInto": "DATE"
+				},
+				{
+					"column": "WADAT_IST",
+					"castInto": "DATE"
+				},
+				{
+					"column": "WERKS",
+					"castInto": "VARCHAR(4)"
+				},
+				{
+					"column": "BUKRS",
+					"castInto": "VARCHAR(4)"
+				},
+				{
+					"column": "PERIV",
+					"castInto": "VARCHAR(2)"
+				},
+				{
+					"column": "KOSTK",
+					"castInto": "VARCHAR(1)"
+				},
+				{
+					"column": "WBSTK",
+					"castInto": "VARCHAR(1)"
+				},
+				{
+					"column": "PKUNRE",
+					"castInto": "VARCHAR(10)"
+				},
+				{
+					"column": "KUNRG",
+					"castInto": "VARCHAR(10)"
+				},
+				{
+					"column": "PSPDNR",
+					"castInto": "VARCHAR(10)"
+				},
+				{
+					"column": "PVRTNR",
+					"castInto": "VARCHAR(10)"
+				},
+				{
+					"column": "PZPERS",
+					"castInto": "VARCHAR(10)"
+				}
+			],
+			"enrichTimeDim": {
+				"joinOn": "WADAT_IST",
+				"requiredColumns": "fisc_month AS fisc_mnth_id"
+			}
+		},
+		"writeConfig": {
+			"partitionKeys": ["fisc_mnth_id"],
+			"repartitionBy": ["fisc_mnth_id"],
+			"hudiConfig": {
+				"recordKey": "VBELN",
+				"tableName": "ZB_2LIS_12_VCHDR",
+				"precombineField": "meta_ingestdt"
+			}
+		},
+		"dev": {
+			"preparedBucket": "ald-dl-data-prepared-ue1-dev",
+			"s3AthenaLocation": "s3://ald-dl-sys-query-results-ue1-dev/",
+			"calendarDimDB": "dld_db",
+			"calendarDimTable": "dim_calendar"
+		},
+		"test": {
+			"preparedBucket": "ald-dl-data-prepared-ue1-test",
+			"s3AthenaLocation": "s3://ald-dl-sys-query-results-ue1-test/",
+			"calendarDimDB": "dld_db",
+			"calendarDimTable": "dim_calendar"
+		},
+		"prod": {
+			"preparedBucket": "ald-dl-data-prepared-ue1-prod",
+			"s3AthenaLocation": "s3://ald-dl-sys-query-results-ue1-prod/",
+			"calendarDimDB": "dld_db",
+			"calendarDimTable": "dim_calendar"
+		}
+	},
+	"catalog": {
+		"athenaIncrementalTable": "incr_zb_12_vchdr",
+		"athenaCompactedTable": "zb_12_vchdr",
+		"schema": [
+			{
+				"Name": "vbeln",
+				"Type": "VARCHAR(10)",
+				"Comment": "Delivery"
+			}, {
+				"Name": "ablad",
+				"Type": "VARCHAR(25)",
+				"Comment": "Unloading Point"
+			}, {
+				"Name": "bldat",
+				"Type": "DATE",
+				"Comment": "Document Date in Document"
+			}, {
+				"Name": "btgew",
+				"Type": "DEC(15,0)",
+				"Comment": "Total Weight"
+			}, {
+				"Name": "bzirk",
+				"Type": "VARCHAR(6)",
+				"Comment": "Sales district"
+			}, {
+				"Name": "erdat",
+				"Type": "DATE",
+				"Comment": "Date on Which Record Was Created"
+			}, {
+				"Name": "faksk",
+				"Type": "VARCHAR(2)",
+				"Comment": "Billing block in SD document"
+			}, {
+				"Name": "gewei",
+				"Type": "VARCHAR(3)",
+				"Comment": "Weight Unit"
+			}, {
+				"Name": "inco1",
+				"Type": "VARCHAR(3)",
+				"Comment": "Incoterms (Part 1)"
+			}, {
+				"Name": "inco2",
+				"Type": "VARCHAR(28)",
+				"Comment": "Incoterms (Part 2)"
+			}, {
+				"Name": "kdgrp",
+				"Type": "VARCHAR(2)",
+				"Comment": "Customer group"
+			}, {
+				"Name": "kodat",
+				"Type": "DATE",
+				"Comment": "Picking Date"
+			}, {
+				"Name": "kunag",
+				"Type": "VARCHAR(10)",
+				"Comment": "Sold-To Party"
+			}, {
+				"Name": "kunnr",
+				"Type": "VARCHAR(10)",
+				"Comment": "Ship-To Party"
+			}, {
+				"Name": "lfart",
+				"Type": "VARCHAR(4)",
+				"Comment": "Delivery Type"
+			}, {
+				"Name": "lfdat",
+				"Type": "DATE",
+				"Comment": "Delivery Date"
+			}, {
+				"Name": "lifex",
+				"Type": "VARCHAR(35)",
+				"Comment": "External Identification of Delivery Note"
+			}, {
+				"Name": "lifnr",
+				"Type": "VARCHAR(10)",
+				"Comment": "Vendor's account number"
+			}, {
+				"Name": "lifsk",
+				"Type": "VARCHAR(2)",
+				"Comment": "Delivery block (document header)"
+			}, {
+				"Name": "lprio",
+				"Type": "DEC(2,0)",
+				"Comment": "Delivery Priority"
+			}, {
+				"Name": "lstel",
+				"Type": "VARCHAR(2)",
+				"Comment": "Loading Point"
+			}, {
+				"Name": "mcbw_anzpk",
+				"Type": "DEC(5,0)",
+				"Comment": "Total number of packages in delivery"
+			}, {
+				"Name": "ntgew",
+				"Type": "DEC(15,0)",
+				"Comment": "Net weight"
+			}, {
+				"Name": "route",
+				"Type": "VARCHAR(6)",
+				"Comment": "Route"
+			}, {
+				"Name": "vbtyp",
+				"Type": "VARCHAR(1)",
+				"Comment": "SD document category"
+			}, {
+				"Name": "verur",
+				"Type": "VARCHAR(35)",
+				"Comment": "Distribution delivery"
+			}, {
+				"Name": "vkorg",
+				"Type": "VARCHAR(4)",
+				"Comment": "Sales Organization"
+			}, {
+				"Name": "vlstk",
+				"Type": "VARCHAR(1)",
+				"Comment": "Distribution Status (Decentralized Warehouse Processing)"
+			}, {
+				"Name": "voleh",
+				"Type": "VARCHAR(3)",
+				"Comment": "Volume Unit"
+			}, {
+				"Name": "volum",
+				"Type": "DEC(15,0)",
+				"Comment": "Volume"
+			}, {
+				"Name": "vstel",
+				"Type": "VARCHAR(4)",
+				"Comment": "Shipping Point/Receiving Point"
+			}, {
+				"Name": "wadat",
+				"Type": "DATE",
+				"Comment": "Planned goods movement date"
+			}, {
+				"Name": "wadat_ist",
+				"Type": "DATE",
+				"Comment": "Actual Goods Movement Date"
+			}, {
+				"Name": "werks",
+				"Type": "VARCHAR(4)",
+				"Comment": "Receiving site for deliveries"
+			}, {
+				"Name": "bukrs",
+				"Type": "VARCHAR(4)",
+				"Comment": "Company code of the sales organization"
+			}, {
+				"Name": "periv",
+				"Type": "VARCHAR(2)",
+				"Comment": "Fiscal Year Variant"
+			}, {
+				"Name": "kostk",
+				"Type": "VARCHAR(1)",
+				"Comment": "Overall picking / putaway status"
+			}, {
+				"Name": "wbstk",
+				"Type": "VARCHAR(1)",
+				"Comment": "Total goods movement status"
+			}, {
+				"Name": "pkunre",
+				"Type": "VARCHAR(10)",
+				"Comment": "Bill-To Party"
+			}, {
+				"Name": "kunrg",
+				"Type": "VARCHAR(10)",
+				"Comment": "Payer"
+			}, {
+				"Name": "pspdnr",
+				"Type": "VARCHAR(10)",
+				"Comment": "Forwarding Agent"
+			}, {
+				"Name": "pvrtnr",
+				"Type": "VARCHAR(10)",
+				"Comment": "Sales Employee"
+			}, {
+				"Name": "pzpers",
+				"Type": "VARCHAR(10)",
+				"Comment": "Person Responsible"
+			}
+		],
+		"PartitionKeys": [
+			{
+				"Name": "fisc_mnth_id",
+				"Type": "string"
+			}
+		],
+		"dev": {
+			"athenaDatabase": "datahub",
+			"athenaCompactedDatabase": "dld_prepared"
+		},
+		"test": {
+			"athenaDatabase": "datahub",
+			"athenaCompactedDatabase": "dlt_prepared"
+		},
+		"prod": {
+			"athenaDatabase": "datahub",
+			"athenaCompactedDatabase": "dlp_prepared"
+		}
+	}
+}

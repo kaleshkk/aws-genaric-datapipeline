@@ -1,0 +1,379 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Pricing Condition AWS pipeline",
+    "Parameters": {
+        "athenaDB": {
+            "Type": "String",
+            "Description": "Athena database for automatic partition reload",
+            "Default": "datahub"
+        },
+        "AthenaTableLocation": {
+            "Type": "String",
+            "Description": "Location of incremental input data set",
+            "Default": "s3://ald-dl-data-prepared-ue1-dev/Incremental/SAPECC/PRICING/ZBPRICE"
+        },
+        "athenaCompactedDB": {
+            "Type": "String",
+            "Description": "Athena database for PII based access"
+        },
+        "AthenaTableCompactedLocation": {
+            "Type": "String",
+            "Description": "Location of compacted input data set"
+        }
+    },
+    "Resources": {
+        "GlueTriggerRawJob": {
+            "Type": "AWS::Glue::Trigger",
+            "Properties": {
+                "Type": "ON_DEMAND",
+                "Description": "customer_demand_sap_raw on-demand trigger for SamplePipeline",
+                "Actions": [
+                    {
+                        "JobName": "customer_demand_sap_raw"
+                    }
+                ],
+                "Name": "tr_ondemand_samplepipeline",
+                "StartOnCreation": false
+            }
+        },
+        "GlueTriggerRawJobIncr": {
+            "Type": "AWS::Glue::Trigger",
+            "Properties": {
+                "Type": "SCHEDULED",
+                "Description": "customer_demand_sap_raw incremental trigger for SamplePipeline",
+                "Schedule": "cron(0 12 * * ? *)",
+                "Actions": [
+                    {
+                        "JobName": "customer_demand_sap_raw"
+                    }
+                ],
+                "Name": "tr_incr_samplepipeline",
+                "StartOnCreation": false
+            }
+        },
+        "AthenaETLTable": {
+            "Type": "AWS::Glue::Table",
+            "Properties": {
+                "CatalogId": {
+                    "Ref": "AWS::AccountId"
+                },
+                "DatabaseName": {
+                    "Ref": "athenaDB"
+                },
+                "TableInput": {
+                    "Description": "Glue catalog for SamplePipeline",
+                    "Name": "incr_zb_price_test",
+                    "StorageDescriptor": {
+                        "Columns": [
+                            {
+                                "Name": "knumh",
+                                "Type": "varchar(10)",
+                                "Comment": "Condition Record"
+                            },
+                            {
+                                "Name": "kbetr",
+                                "Type": "varchar(15)",
+                                "Comment": "Price"
+                            },
+                            {
+                                "Name": "matnr",
+                                "Type": "varchar(20)",
+                                "Comment": "Article Number"
+                            },
+                            {
+                                "Name": "datab",
+                                "Type": "varchar(10)",
+                                "Comment": "Validity end date of the condition record"
+                            },
+                            {
+                                "Name": "datbi",
+                                "Type": "varchar(10)",
+                                "Comment": "Validity start date of the condition record"
+                            },
+                            {
+                                "Name": "vkorg",
+                                "Type": "varchar(5)",
+                                "Comment": "Sales Organization"
+                            },
+                            {
+                                "Name": "pltyp",
+                                "Type": "varchar(10)",
+                                "Comment": "Price List Type"
+                            },
+                            {
+                                "Name": "werks",
+                                "Type": "varchar(8)",
+                                "Comment": "Site (Own or External)"
+                            },
+                            {
+                                "Name": "vtweg",
+                                "Type": "varchar(5)",
+                                "Comment": "Distribution Channel"
+                            },
+                            {
+                                "Name": "konwa",
+                                "Type": "varchar(5)",
+                                "Comment": "Unit of Measure"
+                            },
+                            {
+                                "Name": "condition_table",
+                                "Type": "VARCHAR(10)",
+                                "Comment": "Main source table from SAP ECC"
+                            },
+                            {
+                                "Name": "price_type",
+                                "Type": "varchar(50)"
+                            }
+                        ],
+                        "Location": {
+                            "Ref": "AthenaTableCompactedLocation"
+                        },
+                        "InputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
+                        "OutputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
+                        "Compressed": false,
+                        "NumberOfBuckets": 0,
+                        "SerdeInfo": {
+                            "SerializationLibrary": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
+                            "Parameters": {
+                                "serialization.format": "1"
+                            }
+                        },
+                        "SortColumns": [],
+                        "StoredAsSubDirectories": false
+                    },
+                    "TableType": "EXTERNAL_TABLE",
+                    "PartitionKeys": [
+                        {
+                            "Name": "partition_date",
+                            "Type": "string"
+                        },
+                        {
+                            "Name": "cdm_sales_organization",
+                            "Type": "string"
+                        },
+                        {
+                            "Name": "price_type",
+                            "Type": "string"
+                        }
+                    ]
+                }
+            }
+        },
+        "AthenaCompactedTable": {
+            "Type": "AWS::Glue::Table",
+            "Properties": {
+                "CatalogId": {
+                    "Ref": "AWS::AccountId"
+                },
+                "DatabaseName": {
+                    "Ref": "athenaDB"
+                },
+                "TableInput": {
+                    "Description": "Glue catalog for SamplePipeline",
+                    "Name": "zb_price_test",
+                    "StorageDescriptor": {
+                        "Columns": [
+                            {
+                                "Name": "knumh",
+                                "Type": "varchar(10)",
+                                "Comment": "Condition Record"
+                            },
+                            {
+                                "Name": "kbetr",
+                                "Type": "varchar(15)",
+                                "Comment": "Price"
+                            },
+                            {
+                                "Name": "matnr",
+                                "Type": "varchar(20)",
+                                "Comment": "Article Number"
+                            },
+                            {
+                                "Name": "datab",
+                                "Type": "varchar(10)",
+                                "Comment": "Validity end date of the condition record"
+                            },
+                            {
+                                "Name": "datbi",
+                                "Type": "varchar(10)",
+                                "Comment": "Validity start date of the condition record"
+                            },
+                            {
+                                "Name": "vkorg",
+                                "Type": "varchar(5)",
+                                "Comment": "Sales Organization"
+                            },
+                            {
+                                "Name": "pltyp",
+                                "Type": "varchar(10)",
+                                "Comment": "Price List Type"
+                            },
+                            {
+                                "Name": "werks",
+                                "Type": "varchar(8)",
+                                "Comment": "Site (Own or External)"
+                            },
+                            {
+                                "Name": "vtweg",
+                                "Type": "varchar(5)",
+                                "Comment": "Distribution Channel"
+                            },
+                            {
+                                "Name": "konwa",
+                                "Type": "varchar(5)",
+                                "Comment": "Unit of Measure"
+                            },
+                            {
+                                "Name": "condition_table",
+                                "Type": "VARCHAR(10)",
+                                "Comment": "Main source table from SAP ECC"
+                            },
+                            {
+                                "Name": "price_type",
+                                "Type": "varchar(50)"
+                            }
+                        ],
+                        "Location": {
+                            "Ref": "AthenaTableLocation"
+                        },
+                        "InputFormat": "org.apache.hudi.hadoop.HoodieParquetInputFormat",
+                        "OutputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
+                        "Compressed": false,
+                        "NumberOfBuckets": 0,
+                        "SerdeInfo": {
+                            "SerializationLibrary": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
+                            "Parameters": {
+                                "serialization.format": "1"
+                            }
+                        },
+                        "SortColumns": [],
+                        "StoredAsSubDirectories": false
+                    },
+                    "TableType": "EXTERNAL_TABLE",
+                    "PartitionKeys": [
+                        {
+                            "Name": "partition_date",
+                            "Type": "string"
+                        },
+                        {
+                            "Name": "cdm_sales_organization",
+                            "Type": "string"
+                        },
+                        {
+                            "Name": "price_type",
+                            "Type": "string"
+                        }
+                    ]
+                }
+            }
+        },
+        "AthenaCompactedPIITable": {
+            "Type": "AWS::Glue::Table",
+            "Properties": {
+                "CatalogId": {
+                    "Ref": "AWS::AccountId"
+                },
+                "DatabaseName": {
+                    "Ref": "athenaCompactedDB"
+                },
+                "TableInput": {
+                    "Description": "Glue catalog for SamplePipeline",
+                    "Name": "zb_price_test",
+                    "StorageDescriptor": {
+                        "Columns": [
+                            {
+                                "Name": "knumh",
+                                "Type": "varchar(10)",
+                                "Comment": "Condition Record"
+                            },
+                            {
+                                "Name": "kbetr",
+                                "Type": "varchar(15)",
+                                "Comment": "Price"
+                            },
+                            {
+                                "Name": "matnr",
+                                "Type": "varchar(20)",
+                                "Comment": "Article Number"
+                            },
+                            {
+                                "Name": "datab",
+                                "Type": "varchar(10)",
+                                "Comment": "Validity end date of the condition record"
+                            },
+                            {
+                                "Name": "datbi",
+                                "Type": "varchar(10)",
+                                "Comment": "Validity start date of the condition record"
+                            },
+                            {
+                                "Name": "vkorg",
+                                "Type": "varchar(5)",
+                                "Comment": "Sales Organization"
+                            },
+                            {
+                                "Name": "pltyp",
+                                "Type": "varchar(10)",
+                                "Comment": "Price List Type"
+                            },
+                            {
+                                "Name": "werks",
+                                "Type": "varchar(8)",
+                                "Comment": "Site (Own or External)"
+                            },
+                            {
+                                "Name": "vtweg",
+                                "Type": "varchar(5)",
+                                "Comment": "Distribution Channel"
+                            },
+                            {
+                                "Name": "konwa",
+                                "Type": "varchar(5)",
+                                "Comment": "Unit of Measure"
+                            },
+                            {
+                                "Name": "condition_table",
+                                "Type": "VARCHAR(10)",
+                                "Comment": "Main source table from SAP ECC"
+                            },
+                            {
+                                "Name": "price_type",
+                                "Type": "varchar(50)"
+                            }
+                        ],
+                        "Location": {
+                            "Ref": "AthenaTableLocation"
+                        },
+                        "InputFormat": "org.apache.hudi.hadoop.HoodieParquetInputFormat",
+                        "OutputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
+                        "Compressed": false,
+                        "NumberOfBuckets": 0,
+                        "SerdeInfo": {
+                            "SerializationLibrary": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
+                            "Parameters": {
+                                "serialization.format": "1"
+                            }
+                        },
+                        "SortColumns": [],
+                        "StoredAsSubDirectories": false
+                    },
+                    "TableType": "EXTERNAL_TABLE",
+                    "PartitionKeys": [
+                        {
+                            "Name": "partition_date",
+                            "Type": "string"
+                        },
+                        {
+                            "Name": "cdm_sales_organization",
+                            "Type": "string"
+                        },
+                        {
+                            "Name": "price_type",
+                            "Type": "string"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

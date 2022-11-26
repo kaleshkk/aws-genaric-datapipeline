@@ -1,0 +1,153 @@
+{
+	"AWSTemplateFormatVersion": "2010-09-09",
+	"Description": "Pricing Condition AWS pipeline",
+	"Parameters": {
+		"athenaDB": {
+			"Type": "String",
+			"Description": "Athena database for automatic partition reload",
+		},
+		"AthenaTableLocation": {
+			"Type": "String",
+			"Description": "Location of incremental input data set"
+		},
+		"athenaCompactedDB": {
+			"Type": "String",
+			"Description": "Athena database for PII based access"
+		},
+		"AthenaTableCompactedLocation": {
+			"Type": "String",
+			"Description": "Location of compacted input data set"
+		}
+	},
+	"Resources": {
+		"GlueTriggerRawJob": {
+			"Type": "AWS::Glue::Trigger",
+			"Properties": {
+				"Type": "ON_DEMAND",
+				"Description": "",
+				"Actions": [{
+					"JobName": "customer_demand_sap_raw"
+				}],
+				"Name": "",
+				"StartOnCreation": false
+			}
+		},
+		"GlueTriggerRawJobIncr": {
+			"Type": "AWS::Glue::Trigger",
+			"Properties": {
+				"Type": "SCHEDULED",
+				"Description": "",
+				"Schedule": "",
+				"Actions": [{
+					"JobName": "customer_demand_sap_raw"
+				}],
+				"Name": "",
+				"StartOnCreation": false
+			}
+		},
+		"AthenaETLTable": {
+			"Type": "AWS::Glue::Table",
+			"Properties": {
+				"CatalogId": {
+					"Ref": "AWS::AccountId"
+				},
+				"DatabaseName": {
+					"Ref": "athenaDB"
+				},
+				"TableInput": {
+					"Description": "",
+					"Name": "",
+					"StorageDescriptor": {
+						"Columns": [],
+						"Location": {
+							"Ref": "AthenaTableCompactedLocation"
+						},
+						"InputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
+						"OutputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
+						"Compressed": false,
+						"NumberOfBuckets": 0,
+						"SerdeInfo": {
+							"SerializationLibrary": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
+							"Parameters": {
+								"serialization.format": "1"
+							}
+						},
+						"SortColumns": [],
+						"StoredAsSubDirectories": false
+					},
+					"TableType": "EXTERNAL_TABLE"
+				}
+			}
+		},
+		"AthenaCompactedTable": {
+			"Type": "AWS::Glue::Table",
+			"Properties": {
+				"CatalogId": {
+					"Ref": "AWS::AccountId"
+				},
+				"DatabaseName": {
+					"Ref": "athenaDB"
+				},
+				"TableInput": {
+					"Description": "",
+					"Name": "",
+					"StorageDescriptor": {
+						"Columns": [],
+						"Location": {
+							"Ref": "AthenaTableLocation"
+						},
+						"InputFormat": "org.apache.hudi.hadoop.HoodieParquetInputFormat",
+						"OutputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
+						"Compressed": false,
+						"NumberOfBuckets": 0,
+						"SerdeInfo": {
+							"SerializationLibrary": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
+							"Parameters": {
+								"serialization.format": "1"
+							}
+						},
+						"SortColumns": [],
+						"StoredAsSubDirectories": false
+					},
+					"TableType": "EXTERNAL_TABLE"
+
+				}
+			}
+		},
+		"AthenaCompactedPIITable": {
+			"Type": "AWS::Glue::Table",
+			"Properties": {
+				"CatalogId": {
+					"Ref": "AWS::AccountId"
+				},
+				"DatabaseName": {
+					"Ref": "athenaCompactedDB"
+				},
+				"TableInput": {
+					"Description": "",
+					"Name": "",
+					"StorageDescriptor": {
+						"Columns": [],
+						"Location": {
+							"Ref": "AthenaTableLocation"
+						},
+						"InputFormat": "org.apache.hudi.hadoop.HoodieParquetInputFormat",
+						"OutputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
+						"Compressed": false,
+						"NumberOfBuckets": 0,
+						"SerdeInfo": {
+							"SerializationLibrary": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
+							"Parameters": {
+								"serialization.format": "1"
+							}
+						},
+						"SortColumns": [],
+						"StoredAsSubDirectories": false
+					},
+					"TableType": "EXTERNAL_TABLE"
+
+				}
+			}
+		}
+	}
+}

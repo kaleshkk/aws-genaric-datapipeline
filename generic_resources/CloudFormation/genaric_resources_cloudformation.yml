@@ -1,0 +1,308 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description:  datahub-aws-customer-demand genaric resources
+
+Parameters:
+  WebhookURL:
+    Type: String
+    Description: Enter the webhook URL for teams channel
+  ChannelName:
+    Type: String
+    Description: Enter the teams channel name
+  WebhookUserName:
+    Type: String
+    Description: Enter the webhook user name for teams channel
+
+  Environment:
+    Type: String
+    Description: Environment
+  ConfigBucket:
+    Type: String
+    Description: config.json S3 bucket
+  ConfigLocation:
+    Type: String
+    Description: config.json S3 location
+
+  GlueRoleARN:
+    Type: String
+    Description: Service role ARN for glue jobs
+  SAPConnection:
+    Type: String
+    Description: SAP Connection for raw layer job
+  RawLayerAdditionalLibs:
+    Type: String
+    Description: Python library path for Raw Layer Job
+  RawLayerJobScriptLocation:
+    Type: String
+    Description: Raw layer script location
+  RawLayerStdExtJobScriptLocation:
+    Type: String
+    Description: Raw layer standard extractor script location
+  RawLayerAdditionalJars:
+    Type: String
+    Description: Dependent jars path for raw layer
+
+  PreparedLayerJobScriptLocation:
+    Type: String
+    Description: Prepared layer script location
+  PreparedLayerAdditionalJars:
+    Type: String
+    Description: Dependent jars path for Prepared Layer
+
+  LambdaRoleARN:
+    Type: String
+    Description: Service role ARN for lambda function
+  DynamoDBStreamName:
+    Type: String
+    Description: DynamoDB stream ARN
+
+
+Resources:
+  LambdaFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt ErrorNotificationLambdaFunction.Arn
+      SourceAccount: !Ref AWS::AccountId
+      Principal: { "Fn::Sub": "logs.${AWS::Region}.amazonaws.com" }
+
+  ErrorNotificationLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: python3.7
+      Role: !Ref LambdaRoleARN
+      Handler: index.lambda_handler
+      FunctionName: Customer-Demand-Error-Notification
+      Environment:
+        Variables:
+          webhookURL: !Ref WebhookURL
+          channelName: !Ref ChannelName
+          username: !Ref WebhookUserName
+      Code:
+        ZipFile: |
+          import json
+
+          def lambda_handler(event, context):
+              print(event)
+              print(type(event))
+              # TODO implement
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps('Hello from Lambda!')
+              }
+
+
+          import json
+          import logging
+          import os
+          import urllib3
+          import zlib
+          from base64 import b64decode
+          from datetime import datetime
+
+          from urllib.request import Request, urlopen
+          from urllib.error import URLError, HTTPError
+
+          url = os.environ['webhookURL']
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+
+
+          def lambda_handler(event, context):
+              logger.info('Event: ' + str(event))
+              jobName = event['detail']['jobName']
+              runId = event['detail']['jobRunId']
+              message = event['detail']['message']
+              time = event['time']
+              account = event['account']
+              region = event['region']
+
+
+              message = {
+                  '@type': 'MessageCard',
+                  '@context': 'http://schema.org/extensions',
+                  'themeColor': 'd63333',
+                  'summary': f"Alert - job {jobName} is failed",
+                  'sections': [{
+                      'activityTitle': f"Alert - job {jobName} is failed",
+                      'facts': [
+                          {'name': 'job run Id', 'value': runId},
+                          {'name': 'Error Message', 'value': message},
+                          {'name': 'Issue At', 'value': time},
+                          {'name': 'account', 'value': account},
+                          {'name': 'region', 'value': region},
+                          ],
+                      'markdown': True,
+                      }],
+                  }
+
+              req = Request(url, json.dumps(message).encode('utf-8'))
+
+              try:
+                  response = urlopen(req)
+                  response.read()
+                  logger.info('Message posted')
+                  return {'status': '200 OK'}
+              except Exception as e:
+                  logger.error('Request failed: %d %s', e.code, e.reason)
+              except Exception as e:
+                  logger.error('Server connection failed: %s', e.reason)
+
+      Timeout: 30
+      Description: This function process and post error messages into teams channal for Customer-Demand-Error-Notification.
+      TracingConfig:
+        Mode: Active
+
+
+  RawLayerJob:
+    Type: AWS::Glue::Job
+    Properties:
+      Name: "customer_demand_sap_raw"
+      Description: This job devoleped forcustomer-demand pipeline and it fetch data from source(SAP) to S3 layer
+      Command:
+        Name: glueetl
+        ScriptLocation: !Ref RawLayerJobScriptLocation
+      Role: !Ref GlueRoleARN
+      Connections:
+        Connections:
+          - !Ref SAPConnection
+      GlueVersion: 2.0
+      WorkerType: G.1X
+      NumberOfWorkers: 5
+      Timeout: 8640
+      MaxRetries: 0
+      DefaultArguments:
+        "--extra-jars": !Ref RawLayerAdditionalJars
+        "--enable-continuous-cloudwatch-log": true
+        "--enable-continuous-log-filter": true
+        "--continuous-log-logGroup": "pass from trigger"
+        "--job_src": "pass from trigger"
+        "--environment": !Ref Environment
+        "--configBucket": !Ref ConfigBucket
+        "--configLocation": !Ref ConfigLocation
+        "--TempDir": !Sub 's3://aws-glue-temporary-${AWS::AccountId}-${AWS::Region}/admin'
+
+  RawLayerStdExtJob:
+    Type: AWS::Glue::Job
+    Properties:
+      Name: customer_demand_odata_extractor
+      Description: This job devoleped for customer-demand pipelines and it fetch data from odata service to raw layer
+      ExecutionProperty:
+        MaxConcurrentRuns: 5
+      Timeout: 8640
+      MaxRetries: 0
+      Command:
+        Name: pythonshell
+        PythonVersion: 3
+        ScriptLocation: !Ref RawLayerStdExtJobScriptLocation
+      Role: !Ref GlueRoleARN
+      Connections:
+        Connections:
+          - !Ref SAPConnection
+      MaxCapacity: 1
+      DefaultArguments:
+        "--extra-py-files": !Ref RawLayerAdditionalLibs
+        "--additional-python-modules": pandas
+        '--metaDataDDBName': "pass from trigger"
+        '--sapHostName': "pass from trigger"
+        '--sapClientId': "pass from trigger"
+        '--job_src': "pass from trigger"
+        '--dataS3Bucket': "pass from trigger"
+        '--odpEntitySetName': 'EntityOf2LIS_03_BX'
+        '--LogGroup': "pass from trigger"
+        '--dataChunkSize': "pass from trigger"
+        '--odpServiceName': "pass from trigger"
+        '--sapPort': "pass from trigger"
+        '--sapAuthSecret': "pass from trigger"
+        '--dataS3Folder': "pass from trigger"
+        '--PreparedJobName': "pass from trigger"
+        '--isDeltaEnabledOdata': "YES"
+        '--invokePreparedLayerJob': "no"
+
+  PreparedLayerJob:
+    Type: AWS::Glue::Job
+    Properties:
+      Name: "customer_demand_raw_prepared"
+      Description: This job devoleped for pricing condition pipeline and its trasform data from raw layer to prepared layer
+      Command:
+        Name: glueetl
+        ScriptLocation: !Ref PreparedLayerJobScriptLocation
+      Role: !Ref GlueRoleARN
+      GlueVersion: 2.0
+      WorkerType: G.1X
+      NumberOfWorkers: 5
+      Timeout: 8640
+      MaxRetries: 0
+      DefaultArguments:
+        "--extra-jars": !Ref PreparedLayerAdditionalJars
+        "--enable-continuous-cloudwatch-log": true
+        "--enable-continuous-log-filter": true
+        "--continuous-log-logGroup": "pass from trigger"
+        "--job_src": "pass from trigger"
+        "--environment": !Ref Environment
+        "--configBucket": !Ref ConfigBucket
+        "--configLocation": !Ref ConfigLocation
+        "--conf": spark.serializer=org.apache.spark.serializer.KryoSerializer
+        "--TempDir": !Sub 's3://aws-glue-temporary-${AWS::AccountId}-${AWS::Region}/admin'
+
+  customerDemandLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: python3.7
+      Role: !Ref LambdaRoleARN
+      Handler: index.lambda_handler
+      FunctionName: customer_demand_invoke_prepared_glue_job
+      Code:
+        ZipFile: !Sub |
+          import boto3
+          import logging
+          import os
+          import json
+
+
+          def handler(event, context):
+
+            logger = logging.getLogger(__name__)
+            logger.setLevel(logging.INFO)
+            logging.basicConfig(level=logging.INFO, format=('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+
+            logger.info("{} function invoked".format(context.function_name))
+            logger.info(f"Event :- {event}")
+
+            try:
+                glue = boto3.client('glue')
+                sts = boto3.client("sts")
+
+                for item in event['Records']:
+                    if(item['eventName'] == "INSERT"):
+                        tmp = item['dynamodb']['NewImage']['job_src']
+                        job_src = tmp.get('S')
+
+                        response = glue.start_job_run(
+                              JobName= "prepared_layer_job",
+                                Arguments={
+                                    '--job_src': job_src
+                                }
+                            )
+
+            except Exception as e:
+                logger.error('Error while invoking {}'.format(context.function_name), exc_info=True)
+                raise e
+
+            return {
+                'statusCode': 200,
+                'body': json.dumps('Hello from Lambda!')
+            }
+
+      Description: Invoke a prepared layer job after raw layer for pricing condition.
+      TracingConfig:
+        Mode: Active
+
+  DynamoDBTableStream:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      BatchSize: 1
+      Enabled: True
+      EventSourceArn: !Ref DynamoDBStreamName
+      FunctionName: !GetAtt customerDemandLambdaFunction.Arn
+      StartingPosition: LATEST
+

@@ -1,0 +1,12 @@
+version: 0.2
+phases:
+  pre_build:
+    commands:
+      - mkdir PythonWhls
+  build:
+    commands:
+      - cd PythonWhls
+      - pip wheel awswrangler==2.13.0 --no-deps
+artifacts:
+  files:
+    - '**/*'

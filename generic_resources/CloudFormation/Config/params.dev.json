@@ -1,0 +1,20 @@
+{
+    "Parameters" : {
+        "WebhookURL": "https://thealdogroup.webhook.office.com/webhookb2/65167eaf-67fc-46dd-86e6-d44ac39c3305@8ffb90ad-af22-4413-aa0c-df761c3b56ed/IncomingWebhook/a4dcf4f47e5044bd95bbcf4a3bb134c9/0b694945-dd88-4f6f-b522-1064ef8fefb9",
+        "ChannelName": "TigerTestNotification",
+        "WebhookUserName": "tigerNotification",
+        "Environment": "dev",
+        "ConfigBucket": "ald-dl-data-raw-ue1-dev",
+        "ConfigLocation": "Deploy/datahub-aws-customer-demand/pipelines",
+        "GlueRoleARN": "arn:aws:iam::156785513541:role/AWSGlueServiceRole-ETL-BI",
+        "SAPConnection": "SAP_QAL",
+        "RawLayerAdditionalLibs": "s3://ald-dl-data-raw-ue1-dev/Deploy/datahub-aws-customer-demand/PythonWhls/awswrangler-2.13.0-py3-none-any.whl",
+        "RawLayerJobScriptLocation": "s3://ald-dl-data-raw-ue1-dev/Deploy/datahub-aws-customer-demand/generic_resources/glue/customer_demand_sap_raw.py",
+        "RawLayerStdExtJobScriptLocation": "s3://ald-dl-data-raw-ue1-dev/Deploy/datahub-aws-customer-demand/generic_resources/glue/customer_demand_odata_extractor.py",
+        "RawLayerAdditionalJars": "s3://ald-dl-data-raw-ue1-dev/Deploy/datahub-aws-customer-demand/jars/ngdbc-2.3.55.jar",
+        "PreparedLayerJobScriptLocation": "s3://ald-dl-data-raw-ue1-dev/Deploy/datahub-aws-customer-demand/generic_resources/glue/customer_demand_raw_prepared.py",
+        "PreparedLayerAdditionalJars": "s3://ald-dl-data-raw-ue1-dev/Deploy/datahub-aws-customer-demand/jars/spark-avro_2.11-2.4.0.jar,s3://ald-dl-data-raw-ue1-dev/Deploy/datahub-aws-customer-demand/jars/httpclient-4.5.9.jar,s3://ald-dl-data-raw-ue1-dev/Deploy/datahub-aws-customer-demand/jars/hudi-spark-bundle_2.11-0.6.0.jar",
+        "LambdaRoleARN": "arn:aws:iam::156785513541:role/ald-dl-dev-ddb-lambda-role",
+        "DynamoDBStreamName": "arn:aws:dynamodb:us-east-1:156785513541:table/metadata_raw_prepared_pipeline/stream/2020-11-23T23:04:24.126"
+    }
+  }

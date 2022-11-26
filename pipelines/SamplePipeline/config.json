@@ -1,0 +1,224 @@
+{
+	"pipeline": "sample_pipeline",
+	"projectConfig": {
+		"template": "cds_view",
+		"schedule": "cron(0 12 * * ? *)",
+		"dynamoTable": "metadata_raw_prepared_pipeline"
+	},
+	"rawLayer": {
+		"folder": "/SAPECC/PRICING/ZBPRICE_TEST",
+		"dev": {
+			"rawBucket": "ald-dl-data-raw-ue1-dev"
+		},
+		"test": {
+			"rawBucket": "ald-dl-data-raw-ue1-test"
+		},
+		"prod": {
+			"rawBucket": "ald-dl-data-raw-ue1-prod"
+		}
+	},
+	"preparedLayer": {
+		"transformations": {
+			"filtering": [
+				{
+				"column": "VKORG",
+				"condition": "!=",
+				"predicate": "''"
+			}],
+			"addColumns": [
+				{
+					"columnName": "meta_origin",
+					"value": "'SAP-ECC'",
+					"supportFunction": "lit"
+				},
+				{
+					"columnName": "meta_originvers",
+					"value": "''",
+					"supportFunction": "lit"
+				},
+				{
+					"columnName": "cdm_sales_organization",
+					"value": "VKORG",
+					"supportFunction": "col"
+				},
+				{
+					"columnName": "cdm_article_number",
+					"value": "MATNR",
+					"supportFunction": "col"
+				},
+				{
+					"columnName": "hudi_key",
+					"value": ["", "KNUMH", "KBETR", "MATNR", "DATAB", "DATBI", "VKORG", "PLTYP", "WERKS", "VTWEG"],
+					"supportFunction": "concat_ws"
+				}
+			],
+			"renameColumns": [
+				{
+					"columnName": "PRICE_TYPE",
+					"newColumnName": "price_type"
+				},
+				{
+					"columnName": "ETL_PART_KEY",
+					"newColumnName": "partition_date"
+				}
+			],
+			"castColumns": [
+				{
+					"column": "KNUMH",
+					"castInto": "varchar(10)"
+				},
+				{
+					"column": "KBETR",
+					"castInto": "varchar(15)"
+				},
+				{
+					"column": "MATNR",
+					"castInto": "varchar(20)"
+				},
+				{
+					"column": "DATAB",
+					"castInto": "date"
+				},
+				{
+					"column": "DATBI",
+					"castInto": "date"
+				},
+				{
+					"column": "VKORG",
+					"castInto": "varchar(5)"
+				},
+				{
+					"column": "PLTYP",
+					"castInto": "varchar(10)"
+				},
+				{
+					"column": "WERKS",
+					"castInto": "varchar(8)"
+				},
+				{
+					"column": "VTWEG",
+					"castInto": "varchar(5)"
+				},
+				{
+					"column": "KONWA",
+					"castInto": "varchar(5)"
+				},
+				{
+					"column": "CONDITION_TABLE",
+					"castInto": "varchar(10)"
+				},
+				{
+					"column": "PRICE_TYPE",
+					"castInto": "varchar(50)"
+				}
+			]
+		},
+		"writeConfig": {
+			"partitionKeys": ["partition_date", "cdm_sales_organization", "price_type"],
+			"repartitionBy": ["price_type"],
+			"hudiConfig": {
+				"recordKey": "hudi_key",
+				"tableName": "PRICING_CONDITION_ZBPRC",
+				"precombineField": "meta_ingestdt"
+			}
+		},
+		"dev": {
+			"preparedBucket": "ald-dl-data-prepared-ue1-dev",
+			"s3AthenaLocation": "s3://ald-dl-sys-query-results-ue1-dev/",
+			"calendarDimDB": "dld_db",
+			"calendarDimTable": "dim_calendar"
+		},
+		"test": {
+			"preparedBucket": "ald-dl-data-prepared-ue1-test",
+			"s3AthenaLocation": "s3://ald-dl-sys-query-results-ue1-test/",
+			"calendarDimDB": "dld_db",
+			"calendarDimTable": "dim_calendar"
+		},
+		"prod": {
+			"preparedBucket": "ald-dl-data-prepared-ue1-prod",
+			"s3AthenaLocation": "s3://ald-dl-sys-query-results-ue1-prod/",
+			"calendarDimDB": "dld_db",
+			"calendarDimTable": "dim_calendar"
+		}
+	},
+	"catalog": {
+		"athenaIncrementalTable": "incr_zb_price_test",
+		"athenaCompactedTable": "zb_price_test",
+		"schema": [
+				{
+					"Name": "knumh",
+					"Type": "varchar(10)",
+					"Comment": "Condition Record"
+				}, {
+					"Name": "kbetr",
+					"Type": "varchar(15)",
+					"Comment": "Price"
+				}, {
+					"Name": "matnr",
+					"Type": "varchar(20)",
+					"Comment": "Article Number"
+				}, {
+					"Name": "datab",
+					"Type": "varchar(10)",
+					"Comment": "Validity end date of the condition record"
+				}, {
+					"Name": "datbi",
+					"Type": "varchar(10)",
+					"Comment": "Validity start date of the condition record"
+				}, {
+					"Name": "vkorg",
+					"Type": "varchar(5)",
+					"Comment": "Sales Organization"
+				}, {
+					"Name": "pltyp",
+					"Type": "varchar(10)",
+					"Comment": "Price List Type"
+				}, {
+					"Name": "werks",
+					"Type": "varchar(8)",
+					"Comment": "Site (Own or External)"
+				}, {
+					"Name": "vtweg",
+					"Type": "varchar(5)",
+					"Comment": "Distribution Channel"
+				}, {
+					"Name": "konwa",
+					"Type": "varchar(5)",
+					"Comment": "Unit of Measure"
+				}, {
+					"Name": "condition_table",
+					"Type": "VARCHAR(10)",
+					"Comment": "Main source table from SAP ECC"
+				}, {
+					"Name": "price_type",
+					"Type": "varchar(50)"
+				}
+		],
+		"PartitionKeys": [
+			{
+				"Name": "partition_date",
+				"Type": "string"
+			},
+			{
+				"Name": "cdm_sales_organization",
+				"Type": "string"
+			},
+			{
+				"Name": "price_type",
+				"Type": "string"
+			}
+		],
+		"dev": {
+			"athenaDatabase": "datahub",
+			"athenaCompactedDatabase": "dld_prepared"
+		},
+		"test": {
+			"athenaDatabase": "datahub",
+			"athenaCompactedDatabase": "dlt_prepared"
+		},
+		"prod": {
+			"athenaDatabase": "datahub",
+			"athenaCompactedDatabase": "dlp_prepared"
+		}
+	}
+}

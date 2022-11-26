@@ -1,0 +1,113 @@
+{
+	"pipeline": "",
+	"projectConfig": {
+		"template": "cds_view",
+		"schedule": "cron(0 12 * * ? *)",
+		"dynamoTable": "metadata_raw_prepared_pipeline"
+	},
+	"rawLayer": {
+		"folder": "",
+		"dev": {
+			"rawBucket": "raw-bck"
+		},
+		"test": {
+			"rawBucket": "raw-bck-test"
+		},
+		"prod": {
+			"rawBucket": "raw-bck-prod"
+		}
+	},
+	"preparedLayer": {
+		"transformations": {
+			"filtering": [
+				{
+				"column": "your column name here",
+				"condition": "condition of filter",
+				"predicate": "filter predicate"
+			}],
+			"addColumns": [{
+					"columnName": "meta_origin",
+					"value": "SAP-ECC",
+					"supportFunction": "lit"
+				},
+				{
+					"columnName": "meta_originvers",
+					"value": "''",
+					"supportFunction": "lit"
+				}
+			],
+			"renameColumns": [
+				{
+					"columnName": "current column name here",
+					"newColumnName": "new column type here"
+				}
+			],
+			"castColumns": [
+				{
+					"column": "your column name here",
+					"castInto": "your column type here"
+				}
+			],
+			"enrichTimeDim": {
+				"joinOn": "join key",
+				"requiredColumns": "fisc_mnth_id"
+			}
+		},
+		"writeConfig": {
+			"partitionKeys": ["partition key"],
+			"repartitionBy": ["partition key"],
+			"hudiConfig": {
+				"recordKey": "hudi_key",
+				"tableName": "",
+				"precombineField": "meta_ingestdt"
+			}
+		},
+		"dev": {
+			"preparedBucket": "prepared-bck-dev",
+			"s3AthenaLocation": "qry-rslt-bck-dev/",
+			"calendarDimDB": "dld_db",
+			"calendarDimTable": "dim_calendar"
+		},
+		"test": {
+			"preparedBucket": "prepared-bck-test",
+			"s3AthenaLocation": "qry-rslt-bck-test/",
+			"calendarDimDB": "dld_db",
+			"calendarDimTable": "dim_calendar"
+		},
+		"prod": {
+			"preparedBucket": "prepared-bck-prod",
+			"s3AthenaLocation": "qry-rslt-bck-prod/",
+			"calendarDimDB": "dld_db",
+			"calendarDimTable": "dim_calendar"
+		}
+	},
+	"catalog": {
+		"athenaIncrementalTable": "incremental table name",
+		"athenaCompactedTable": "compacted table name",
+		"schema": [
+			{
+				"Name": "column name",
+				"Type": "data type",
+				"Comment": "column definition"
+			}
+		],
+		"PartitionKeys": [
+			{
+				"column": "column name",
+				"type": "data type"
+			}
+		],
+		"dev": {
+			"athenaDatabase": "datahub",
+			"athenaCompactedDatabase": "dld_prepared"
+		},
+		"test": {
+			"athenaDatabase": "datahub",
+			"athenaCompactedDatabase": "dlt_prepared"
+		},
+		"prod": {
+			"athenaDatabase": "datahub",
+			"athenaCompactedDatabase": "dlp_prepared"
+		}
+	}
+}

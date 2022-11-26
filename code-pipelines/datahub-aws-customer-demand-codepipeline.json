@@ -1,0 +1,209 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "The codepipeline for datahub-aws-customer-demand",
+    "Parameters": {
+        "AWSCodePipelineServiceRole": {
+            "Type": "String",
+            "Description": "AWSCodePipelineServiceRole",
+            "Default": "arn:aws:iam::156785513541:role/service-role/AWSCodePipelineServiceRole-us-east-1-dh-s3-cloudformation"
+        },
+        "ConnectionArn": {
+            "Type": "String",
+            "Description": "codestart connection ARN",
+            "Default": "arn:aws:codestar-connections:us-east-1:156785513541:connection/39da4158-b420-46ab-a173-e1d953cd6511"
+        },
+        "Repository": {
+            "Type": "String",
+            "Description": "Bitbucket code repository",
+            "Default": "aldogrp/datahub-aws-customer-demand"
+        },
+        "Branch": {
+            "Type": "String",
+            "Description": "Bitbucket branch",
+            "Default": "dev"
+        },
+        "ProjectName": {
+            "Type": "String",
+            "Description": "Codebuild project name",
+            "Default": "aldo-dev-builder"
+        },
+        "BucketName": {
+            "Type": "String",
+            "Description": "S3 bucket for deploy",
+            "Default": "ald-dl-data-raw-ue1-dev"
+        },
+        "S3ObjectKey": {
+            "Type": "String",
+            "Description": "S3 location for deploy",
+            "Default": "Deploy/datahub-aws-customer-demand"
+        },
+        "CloudformationRole": {
+            "Type": "String",
+            "Description": "Codebuild project name",
+            "Default": "arn:aws:iam::156785513541:role/custom_cloudformation_role"
+        }
+    },
+    "Resources": {
+        "DatahubAwsCD": {
+            "Type": "AWS::CodePipeline::Pipeline",
+            "Properties": {
+                "Name": "datahub-aws-customer-demand-pipeline",
+                "RoleArn": {
+                    "Ref": "AWSCodePipelineServiceRole"
+                },
+                "ArtifactStore": {
+                    "Type": "S3",
+                    "Location": "codepipeline-us-east-1-172004411357"
+                },
+                "Stages": [
+                    {
+                        "Name": "Source",
+                        "Actions": [
+                            {
+                                "Name": "source",
+                                "ActionTypeId": {
+                                    "Category": "Source",
+                                    "Owner": "AWS",
+                                    "Provider": "CodeStarSourceConnection",
+                                    "Version": "1"
+                                },
+                                "Configuration": {
+                                    "BranchName": {
+                                        "Ref": "Branch"
+                                    },
+                                    "ConnectionArn": {
+                                        "Ref": "ConnectionArn"
+                                    },
+                                    "FullRepositoryId": {
+                                        "Ref": "Repository"
+                                    },
+                                    "OutputArtifactFormat": "CODE_ZIP"
+                                },
+                                "OutputArtifacts": [
+                                    {
+                                        "Name": "SourceArtifact"
+                                    }
+                                ],
+                                "InputArtifacts": [],
+                                "Region": "us-east-1"
+                            }
+                        ]
+                    },
+                    {
+                        "Name": "Build",
+                        "Actions": [
+                            {
+                                "Name": "Build",
+                                "ActionTypeId": {
+                                    "Category": "Build",
+                                    "Owner": "AWS",
+                                    "Provider": "CodeBuild",
+                                    "Version": "1"
+                                },
+                                "Configuration": {
+                                    "ProjectName": {
+                                        "Ref": "ProjectName"
+                                    }
+                                },
+                                "OutputArtifacts": [
+                                    {
+                                        "Name": "OutputArtifact"
+                                    }
+                                ],
+                                "InputArtifacts": [
+                                    {
+                                        "Name": "SourceArtifact"
+                                    }
+                                ],
+                                "Region": "us-east-1"
+                            }
+                        ]
+                    },
+                    {
+                        "Name": "Deploy",
+                        "Actions": [
+                            {
+                                "Name": "Deploy",
+                                "ActionTypeId": {
+                                    "Category": "Deploy",
+                                    "Owner": "AWS",
+                                    "Provider": "S3",
+                                    "Version": "1"
+                                },
+                                "Configuration": {
+                                    "BucketName": {
+                                        "Ref": "BucketName"
+                                    },
+                                    "Extract": "true",
+                                    "ObjectKey": {
+                                        "Ref": "S3ObjectKey"
+                                    }
+                                },
+                                "OutputArtifacts": [],
+                                "InputArtifacts": [
+                                    {
+                                        "Name": "OutputArtifact"
+                                    }
+                                ],
+                                "Region": "us-east-1",
+                                "Namespace": "DeployVariables"
+                            },
+                            {
+                                "Name": "CUSTOMER_DEMAND_GENARIC_RESOURCES",
+                                "ActionTypeId": {
+                                    "Category": "Deploy",
+                                    "Owner": "AWS",
+                                    "Provider": "CloudFormation",
+                                    "Version": "1"
+                                },
+                                "RunOrder": 2,
+                                "Configuration": {
+                                    "ActionMode": "CREATE_UPDATE",
+                                    "RoleArn": {
+                                        "Ref": "CloudformationRole"
+                                    },
+                                    "StackName": "DLake-Customer-Demand-Genaric-Resources",
+                                    "TemplateConfiguration": "SourceArtifact::generic_resources/CloudFormation/Config/params.dev.json",
+                                    "TemplatePath": "SourceArtifact::generic_resources/CloudFormation/genaric_resources_cloudformation.yml"
+                                },
+                                "OutputArtifacts": [],
+                                "InputArtifacts": [
+                                    {
+                                        "Name": "SourceArtifact"
+                                    }
+                                ],
+                                "Region": "us-east-1"
+                            },
+                            {
+                                "Name": "DLake-Customer-Demand-SamplePipeline-Pipeline",
+                                "ActionTypeId": {
+                                    "Category": "Deploy",
+                                    "Owner": "AWS",
+                                    "Provider": "CloudFormation",
+                                    "Version": "1"
+                                },
+                                "RunOrder": 2,
+                                "Configuration": {
+                                    "ActionMode": "CREATE_UPDATE",
+                                    "RoleArn": {
+                                        "Ref": "CloudformationRole"
+                                    },
+                                    "StackName": "DLake-Customer-Demand-SamplePipeline-Pipeline",
+                                    "TemplateConfiguration": "SourceArtifact::pipelines/SamplePipeline/CloudFormation/Config/params.dev.json",
+                                    "TemplatePath": "SourceArtifact::pipelines/SamplePipeline/CloudFormation/cloudformation.json"
+                                },
+                                "OutputArtifacts": [],
+                                "InputArtifacts": [
+                                    {
+                                        "Name": "SourceArtifact"
+                                    }
+                                ],
+                                "Region": "us-east-1"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+}

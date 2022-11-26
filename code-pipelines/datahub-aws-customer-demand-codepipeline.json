@@ -1,59 +1,54 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "The codepipeline for datahub-aws-customer-demand",
+    "Description": "The codepipeline for genaric pipeline",
     "Parameters": {
         "AWSCodePipelineServiceRole": {
             "Type": "String",
             "Description": "AWSCodePipelineServiceRole",
-            "Default": "arn:aws:iam::156785513541:role/service-role/AWSCodePipelineServiceRole-us-east-1-dh-s3-cloudformation"
+            "Default": "arn:aws:iam::680832645642:role/service-role/AWSCodePipelineServiceRole-us-east-1-test"
         },
         "ConnectionArn": {
             "Type": "String",
             "Description": "codestart connection ARN",
-            "Default": "arn:aws:codestar-connections:us-east-1:156785513541:connection/39da4158-b420-46ab-a173-e1d953cd6511"
+            "Default": "arn:aws:codestar-connections:us-east-1:680832645642:connection/0824f3ec-e9ed-416b-8560-86ab187deb2a"
         },
         "Repository": {
             "Type": "String",
             "Description": "Bitbucket code repository",
-            "Default": "aldogrp/datahub-aws-customer-demand"
+            "Default": "kaleshkk/aws-genaric-datapipeline"
         },
         "Branch": {
             "Type": "String",
             "Description": "Bitbucket branch",
-            "Default": "dev"
-        },
-        "ProjectName": {
-            "Type": "String",
-            "Description": "Codebuild project name",
-            "Default": "aldo-dev-builder"
+            "Default": "without_cdk"
         },
         "BucketName": {
             "Type": "String",
             "Description": "S3 bucket for deploy",
-            "Default": "ald-dl-data-raw-ue1-dev"
+            "Default": "genaric-pipeline-code-resourse"
         },
         "S3ObjectKey": {
             "Type": "String",
             "Description": "S3 location for deploy",
-            "Default": "Deploy/datahub-aws-customer-demand"
+            "Default": "Deploy/aws-genaric-datapipeline"
         },
         "CloudformationRole": {
             "Type": "String",
             "Description": "Codebuild project name",
-            "Default": "arn:aws:iam::156785513541:role/custom_cloudformation_role"
+            "Default": "arn:aws:iam::680832645642:role/cloudformation-role"
         }
     },
     "Resources": {
         "DatahubAwsCD": {
             "Type": "AWS::CodePipeline::Pipeline",
             "Properties": {
-                "Name": "datahub-aws-customer-demand-pipeline",
+                "Name": "genaric pipeline",
                 "RoleArn": {
                     "Ref": "AWSCodePipelineServiceRole"
                 },
                 "ArtifactStore": {
                     "Type": "S3",
-                    "Location": "codepipeline-us-east-1-172004411357"
+                    "Location": "genaric-codepipeline-bck"
                 },
                 "Stages": [
                     {
@@ -85,36 +80,6 @@
                                     }
                                 ],
                                 "InputArtifacts": [],
-                                "Region": "us-east-1"
-                            }
-                        ]
-                    },
-                    {
-                        "Name": "Build",
-                        "Actions": [
-                            {
-                                "Name": "Build",
-                                "ActionTypeId": {
-                                    "Category": "Build",
-                                    "Owner": "AWS",
-                                    "Provider": "CodeBuild",
-                                    "Version": "1"
-                                },
-                                "Configuration": {
-                                    "ProjectName": {
-                                        "Ref": "ProjectName"
-                                    }
-                                },
-                                "OutputArtifacts": [
-                                    {
-                                        "Name": "OutputArtifact"
-                                    }
-                                ],
-                                "InputArtifacts": [
-                                    {
-                                        "Name": "SourceArtifact"
-                                    }
-                                ],
                                 "Region": "us-east-1"
                             }
                         ]

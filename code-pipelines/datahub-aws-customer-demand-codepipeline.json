@@ -42,7 +42,7 @@
         "DatahubAwsCD": {
             "Type": "AWS::CodePipeline::Pipeline",
             "Properties": {
-                "Name": "genaric pipeline",
+                "Name": "generic-pipeline",
                 "RoleArn": {
                     "Ref": "AWSCodePipelineServiceRole"
                 },

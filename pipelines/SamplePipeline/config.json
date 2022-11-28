@@ -209,15 +209,15 @@
 			}
 		],
 		"dev": {
-			"athenaDatabase": "datahub",
-			"athenaCompactedDatabase": "dld_prepared"
+			"athenaDatabase": "mask2",
+			"athenaCompactedDatabase": "mask"
 		},
 		"test": {
-			"athenaDatabase": "datahub",
+			"athenaDatabase": "mask2",
 			"athenaCompactedDatabase": "dlt_prepared"
 		},
 		"prod": {
-			"athenaDatabase": "datahub",
+			"athenaDatabase": "mask2",
 			"athenaCompactedDatabase": "dlp_prepared"
 		}
 	}

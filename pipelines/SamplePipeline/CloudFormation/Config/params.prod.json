@@ -1,8 +1,8 @@
 {
     "Parameters": {
         "athenaDB": "datahub",
-        "AthenaTableLocation": "s3://ald-dl-data-prepared-ue1-prod/Incremental/SAPECC/PRICING/ZBPRICE_TEST",
-        "athenaCompactedDB": "dlp_prepared",
-        "AthenaTableCompactedLocation": "s3://ald-dl-data-prepared-ue1-prod/Compacted/SAPECC/PRICING/ZBPRICE_TEST"
+        "AthenaTableLocation": "s3://maskprepared-ue1-dev/Incremental/SAPECC/PRICING/ZBPRICE_TEST",
+        "athenaCompactedDB": "dld_prepared",
+        "AthenaTableCompactedLocation": "s3://maskprepared-ue1-dev/Compacted/SAPECC/PRICING/ZBPRICE_TEST"
     }
 }

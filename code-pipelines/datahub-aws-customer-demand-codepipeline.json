@@ -215,12 +215,12 @@
                         ]
                     }
                 },
-                "Name": "test2",
+                "Name": "test3",
                 "RoleArn": "arn:aws:iam::680832645642:role/service-role/Amazon_EventBridge_Invoke_CodePipeline_1676662036",
                 "Targets": [
                     {
                         "Arn": "arn:aws:codepipeline:us-east-1:680832645642:generic-pipeline",
-                        "Id": "pipeline1",
+                        "Id": "pipeline3",
                         "RoleArn": "arn:aws:iam::680832645642:role/service-role/Amazon_EventBridge_Invoke_CodePipeline_1676662036"
                     }
                 ]

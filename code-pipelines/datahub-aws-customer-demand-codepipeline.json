@@ -246,6 +246,36 @@
                     }
                 ]
             }
+        },
+        "PipelineRule": {
+            "Type": "AWS::Events::Rule",
+            "Properties": {
+                "EventBusName": "default",
+                "EventPattern": {
+                    "source": [
+                        "aws.codepipeline"
+                    ],
+                    "detail-type": [
+                        "CodePipeline Pipeline Execution State Change"
+                    ],
+                    "resources": [
+                        "arn:aws:codepipeline:us-east-1:680832645642:generic-pipeline"
+                    ],
+                    "detail": {
+                        "state": [
+                            "CANCELED"
+                        ]
+                    }
+                },
+                "Name": "test2",
+                "RoleArn": "arn:aws:iam::680832645642:role/service-role/Amazon_EventBridge_Invoke_CodePipeline_1676662036",
+                "Targets": [
+                    {
+                        "Arn": "arn:aws:codepipeline:us-east-1:680832645642:generic-pipeline",
+                        "RoleArn": "arn:aws:iam::680832645642:role/service-role/Amazon_EventBridge_Invoke_CodePipeline_1676662036"
+                    }
+                ]
+            }
         }
     }
 }
